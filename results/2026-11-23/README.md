@@ -2,12 +2,15 @@
 
 All JSON files in `coding-context/` are per-run evidence copied from the local Strata test directory and sanitized with this repository's `scripts/sanitize_results.py`. No model weights, API credentials, user-home paths, local engine logs, or real project source are included.
 
+See the [model catalog](../../docs/model-catalog.md) for parameter counts and exact file sizes, [expected performance guide](../../docs/expected-performance.md) for interpreting tok/s, [quantization primer](../../docs/quantization-primer.md), and [storage follow-up plan](../../docs/storage-follow-up.md).
+
 ## Machine and test configuration
 
 - Ryzen 9 9950X3D, 16 cores
 - NVIDIA GeForce RTX 5090, 32 GB VRAM; driver 621.01
 - 128 GB RAM; Windows 11 Pro
-- 2 TB Kingston NVMe, model files stored on C: during these runs; the Crucial T500 was not installed yet
+- 2 TB Kingston FURY Renegade G5 PCIe 5.0 NVMe, model files on C:; owner-reported first CPU-connected `M2A_CPU` slot
+- Crucial T500 4 TB not installed yet; planned comparison slot is chipset-connected `M2D_SB`
 - Strata 0.2.20 / engine 0.1.66 for Inkling and Qwen
 - Strata 0.2.13 / DeepSeek engine 0.1.59 for DeepSeek V4.1 Flash IST-DAS 2.00 bpw (the model was marked retired in Strata 0.2.20)
 - Temperature 0; 100-token output cap; synthetic multi-file Python code-review workload

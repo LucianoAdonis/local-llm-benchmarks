@@ -12,7 +12,7 @@ This first public run measures one Windows PC across Strata models from short pr
 | GPU | NVIDIA GeForce RTX 5090, 32 GB VRAM |
 | System memory | 128 GB |
 | OS | Windows 11 Pro |
-| Storage during run | Kingston 2 TB NVMe; Crucial T500 had not yet been installed |
+| Storage during run | Kingston FURY Renegade G5 2 TB PCIe 5.0 NVMe in the first CPU-connected M.2 slot (`M2A_CPU`, owner-reported); Crucial T500 had not yet been installed |
 | Strata | 0.2.20 / engine 0.1.66 for Inkling and Qwen; DeepSeek compatibility install 0.2.13 / engine 0.1.59 |
 
 Models were installed locally; this repository contains no model weights. See [the Strata replication playbook](docs/strata-replication.md) and [copy-ready model requests](prompts/model-download-requests.md).
@@ -33,13 +33,19 @@ The DeepSeek 256K run read 250,119 prompt tokens plus a 100-token output cap (ab
 
 ## Models and files
 
-| Model | Tested variants | Model files are hosted by |
-|---|---|---|
-| DeepSeek V4.1 Flash 1017, IST-DAS 2.00 bpw Strata pack | 2.00 bpw; 32K, 128K, 256K profiles | [ISTA-DASLab GSQ-RCO GGUF](https://huggingface.co/ISTA-DASLab/DeepSeek-V4.1-Flash-1017-GSQ-RCO-GGUF) and Strata-managed pack files |
-| Inkling-2-Mini | native SQ-10 / SQ-15 / SQ-20; UD-Q3_K_XL; UD-Q4_K_M GGUF | [Strata native packs](https://huggingface.co/strata-engine/Inkling-2-Mini-Strata), [Unsloth GGUF](https://huggingface.co/unsloth/Inkling-2-Mini-GGUF) |
-| Qwen3.6-35B-A3B | UD-Q4_K_XL GGUF | [Unsloth MTP GGUF](https://huggingface.co/unsloth/Qwen3.6-35B-A3B-MTP-GGUF) |
+| Model | Parameters | Tested file/quant | Local download size |
+|---|---|---|---:|
+| [DeepSeek V4.1 Flash 1017](https://huggingface.co/ISTA-DASLab/DeepSeek-V4.1-Flash-1017-GSQ-RCO-GGUF) | 763.2B total; 6/384 routed experts active per token | IST-DAS IQ2_XXS backbone, 2.00 bpw, plus Engram and DSpark | 256.81 GB total pack |
+| [Inkling-2-Mini](https://huggingface.co/thinkingmachines/Inkling-2-Mini) | 26.4B total; 3.4B active | [native SQ-10 / SQ-15 / SQ-20](https://huggingface.co/strata-engine/Inkling-2-Mini-Strata); [UD-Q3_K_XL / UD-Q4_K_M GGUF](https://huggingface.co/unsloth/Inkling-2-Mini-GGUF) | 10.47 / 14.35 / 19.35 / 13.63 / 16.61 GB |
+| [Qwen3.6-35B-A3B](https://huggingface.co/unsloth/Qwen3.6-35B-A3B-MTP-GGUF) | 35B total; 3B active | [UD-Q4_K_XL MTP GGUF](https://huggingface.co/unsloth/Qwen3.6-35B-A3B-MTP-GGUF/blob/main/Qwen3.6-35B-A3B-UD-Q4_K_XL.gguf) | 22.85 GB |
 
-Model licenses and acceptable-use terms belong to their respective publishers. Check each model card before downloading. The model links above identify tested sources; Strata may offer a managed download path or pack that includes supporting files.
+The file sizes above are measured local downloads; DeepSeek's package includes support files in addition to its 2.00 bpw backbone. See the [model catalog](docs/model-catalog.md) for exact filenames, GB/GiB breakdowns, parameter explanations, and direct file links. Model licenses and acceptable-use terms belong to their publishers.
+
+## Read the results and plan the next tuning step
+
+- [How to read tok/s and what to expect on this PC](docs/expected-performance.md)
+- [Quantization primer: 4-bit versus DeepSeek at 2.00 bpw](docs/quantization-primer.md)
+- [Storage topology and planned Kingston-versus-T500 test](docs/storage-follow-up.md)
 
 ## Reproduce
 

@@ -7,7 +7,7 @@
     "vram_gb": 32,
     "ram_gb": 128,
     "os": "Windows 11 Pro",
-    "storage": "2 TB Kingston NVMe; Crucial T500 not installed during this run"
+    "storage": "2 TB Kingston FURY Renegade G5 PCIe 5.0 NVMe on C:, owner-reported in CPU-connected M2A_CPU; Crucial T500 4 TB not installed during this run, planned M2D_SB comparison"
   },
   "runtime": {
     "inkling_qwen": {"strata": "0.2.20", "engine": "0.1.66"},
