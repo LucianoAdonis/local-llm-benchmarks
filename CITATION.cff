@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If these results helped your work, please cite the repository."
+title: "Local LLM Hardware Benchmarks"
+authors:
+  - family-names: "Adonis V."
+    given-names: "Luciano"
+    affiliation: "Independent"
+repository-code: "https://github.com/LucianoAdonis/local-llm-benchmarks"
+license: MIT

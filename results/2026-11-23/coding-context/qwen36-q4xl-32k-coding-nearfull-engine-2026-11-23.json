@@ -1,0 +1,55 @@
+{
+  "schema": "strata-engine-log-coding-benchmark-v1",
+  "started_at_utc": "2026-11-23T14:31:34.099414+00:00",
+  "model": "qwen3.6-35b-a3b-ud-q4_k_xl",
+  "profile": "qwen36-q4-32k",
+  "configured_context_tokens": 32768,
+  "workload": "synthetic multi-file Python code review; unique section names per request",
+  "sections_per_request": 200,
+  "max_output_tokens": 100,
+  "temperature": 0,
+  "measurement": "engine-log prompt and decode token/time rows; client-observed TTFT and total wall time",
+  "summary": {
+    "median_prompt_tokens_read": 27501,
+    "median_engine_prefill_tokens_per_s": 7327.738,
+    "median_engine_decode_tokens_per_s": 163.132,
+    "median_client_first_content_s": null,
+    "median_client_wall_s": 4.4051
+  },
+  "runs": [
+    {
+      "run": 1,
+      "sections": 200,
+      "api_usage": {
+        "prompt_tokens": 27501,
+        "completion_tokens": 100,
+        "total_tokens": 27601,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      },
+      "engine_passes": [
+        {
+          "prompt": 27501,
+          "reused": 0,
+          "read": 27501,
+          "prefill_ms": 3753,
+          "generated": 100,
+          "decode_ms": 613
+        }
+      ],
+      "prompt_tokens_read": 27501,
+      "prefill_ms": 3753,
+      "engine_prefill_tokens_per_s": 7327.738,
+      "engine_generated_tokens": 100,
+      "decode_ms": 613,
+      "engine_decode_tokens_per_s": 163.132,
+      "client_first_content_s": null,
+      "client_wall_s": 4.4051
+    }
+  ],
+  "caveats": [
+    "Engine decode and prefill values come from this engine's own timing rows; compare only matching model, engine, context, workload, and settings.",
+    "Synthetic code-review prompts measure serving speed, not coding quality."
+  ]
+}

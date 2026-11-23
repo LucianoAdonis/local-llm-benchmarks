@@ -1,0 +1,85 @@
+{
+  "schema": "strata-engine-log-coding-benchmark-v1",
+  "started_at_utc": "2026-11-23T14:41:42.461879+00:00",
+  "model": "qwen3.6-35b-a3b-ud-q4_k_xl",
+  "profile": "qwen36-q4-128k",
+  "configured_context_tokens": 131072,
+  "workload": "synthetic multi-file Python code review; unique section names per request",
+  "sections_per_request": 400,
+  "max_output_tokens": 100,
+  "temperature": 0,
+  "measurement": "engine-log prompt and decode token/time rows; client-observed TTFT and total wall time",
+  "summary": {
+    "median_prompt_tokens_read": 54901.0,
+    "median_engine_prefill_tokens_per_s": 4158.137,
+    "median_engine_decode_tokens_per_s": 92.636,
+    "median_client_first_content_s": null,
+    "median_client_wall_s": 14.3326
+  },
+  "runs": [
+    {
+      "run": 1,
+      "sections": 400,
+      "api_usage": {
+        "prompt_tokens": 54901,
+        "completion_tokens": 100,
+        "total_tokens": 55001,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      },
+      "engine_passes": [
+        {
+          "prompt": 54901,
+          "reused": 0,
+          "read": 54901,
+          "prefill_ms": 13332,
+          "generated": 100,
+          "decode_ms": 1083
+        }
+      ],
+      "prompt_tokens_read": 54901,
+      "prefill_ms": 13332,
+      "engine_prefill_tokens_per_s": 4117.987,
+      "engine_generated_tokens": 100,
+      "decode_ms": 1083,
+      "engine_decode_tokens_per_s": 92.336,
+      "client_first_content_s": null,
+      "client_wall_s": 14.4565
+    },
+    {
+      "run": 2,
+      "sections": 400,
+      "api_usage": {
+        "prompt_tokens": 54901,
+        "completion_tokens": 100,
+        "total_tokens": 55001,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      },
+      "engine_passes": [
+        {
+          "prompt": 54901,
+          "reused": 0,
+          "read": 54901,
+          "prefill_ms": 13077,
+          "generated": 100,
+          "decode_ms": 1076
+        }
+      ],
+      "prompt_tokens_read": 54901,
+      "prefill_ms": 13077,
+      "engine_prefill_tokens_per_s": 4198.287,
+      "engine_generated_tokens": 100,
+      "decode_ms": 1076,
+      "engine_decode_tokens_per_s": 92.937,
+      "client_first_content_s": null,
+      "client_wall_s": 14.2087
+    }
+  ],
+  "caveats": [
+    "Engine decode and prefill values come from this engine's own timing rows; compare only matching model, engine, context, workload, and settings.",
+    "Synthetic code-review prompts measure serving speed, not coding quality."
+  ]
+}

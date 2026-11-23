@@ -1,0 +1,70 @@
+{
+  "schema": "strata-coding-context-benchmark-v1",
+  "started_at_utc": "2026-11-23T14:24:43.824757+00:00",
+  "endpoint": "<LOCAL_API_URL>/v1/chat/completions",
+  "model": "inkling-2-mini-sq-10",
+  "profile": "inkling-sq10-32k",
+  "configured_context_tokens": 32768,
+  "workload": "synthetic multi-file Python code review",
+  "sections_per_request": 35,
+  "max_output_tokens": 100,
+  "temperature": 0,
+  "measurement": "streaming API usage counts and client-observed first-content/request timing",
+  "summary": {
+    "median_prompt_tokens": 5748,
+    "median_prompt_tokens_per_s_to_first_content": 5403.259,
+    "median_time_to_first_content_s": 1.0638,
+    "median_decode_window_output_tokens_per_s": 170.206,
+    "median_end_to_end_output_tokens_per_s": 58.774
+  },
+  "caveats": [
+    "Prompt throughput is prompt_tokens divided by time to first streamed content; TTFT includes loopback request overhead and any server queueing, so it is a client-observed prefill proxy.",
+    "Decode-window rate is output tokens divided by time from first streamed text to stream end; it is not kernel-only decode speed.",
+    "The generated source excerpts form a repeatable synthetic coding workload, not a quality benchmark or a real repository audit.",
+    "Unique benchmark run identifiers are placed before the source excerpts to reduce prompt-cache reuse across repeats."
+  ],
+  "runs": [
+    {
+      "nonce": 1,
+      "sections": 35,
+      "prompt_tokens": 5748,
+      "completion_tokens": 100,
+      "time_to_first_content_s": 1.3568,
+      "request_wall_s": 1.9443,
+      "decode_window_s": 0.5875,
+      "prompt_tokens_per_s_to_first_content": 4236.398,
+      "output_tokens_per_s_decode_window": 170.206,
+      "output_tokens_per_s_end_to_end": 51.431,
+      "completion_chars": 356,
+      "finish_reason": "length"
+    },
+    {
+      "nonce": 2,
+      "sections": 35,
+      "prompt_tokens": 5748,
+      "completion_tokens": 100,
+      "time_to_first_content_s": 1.0509,
+      "request_wall_s": 1.5882,
+      "decode_window_s": 0.5373,
+      "prompt_tokens_per_s_to_first_content": 5469.408,
+      "output_tokens_per_s_decode_window": 186.113,
+      "output_tokens_per_s_end_to_end": 62.963,
+      "completion_chars": 351,
+      "finish_reason": "length"
+    },
+    {
+      "nonce": 3,
+      "sections": 35,
+      "prompt_tokens": 5748,
+      "completion_tokens": 100,
+      "time_to_first_content_s": 1.0638,
+      "request_wall_s": 1.7014,
+      "decode_window_s": 0.6376,
+      "prompt_tokens_per_s_to_first_content": 5403.259,
+      "output_tokens_per_s_decode_window": 156.833,
+      "output_tokens_per_s_end_to_end": 58.774,
+      "completion_chars": 352,
+      "finish_reason": "length"
+    }
+  ]
+}

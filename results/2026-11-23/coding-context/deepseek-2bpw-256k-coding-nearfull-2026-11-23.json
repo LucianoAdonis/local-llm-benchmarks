@@ -1,0 +1,63 @@
+{
+  "schema": "strata-deepseek-engine-coding-benchmark-v1",
+  "started_at_utc": "2026-11-23T14:46:40.374292+00:00",
+  "model": "deepseek-v4.1-flash",
+  "profile": "deepseek-coding-256k",
+  "configured_context_tokens": 262144,
+  "workload": "synthetic multi-file Python code review; every section is unique per run to avoid prompt-cache reuse",
+  "sections_per_request": 2000,
+  "max_output_tokens": 100,
+  "temperature": 0,
+  "metrics": "engine-reported prompt-read and generation milliseconds/tokens, plus API-reported prompt/completion token counts",
+  "summary": {
+    "median_api_prompt_tokens": 250119,
+    "median_engine_prefill_tokens_per_s": 2505.77,
+    "median_engine_decode_tokens_per_s": 20.891,
+    "median_client_first_content_s": 102.5997,
+    "median_client_request_wall_s": 104.108
+  },
+  "runs": [
+    {
+      "run": 60,
+      "sections": 2000,
+      "api_prompt_tokens": 250119,
+      "api_completion_tokens": 100,
+      "client_time_to_first_content_s": 102.5997,
+      "client_request_wall_s": 104.108,
+      "engine_passes": [
+        {
+          "prompt": 250119,
+          "reused": 0,
+          "read": 250119,
+          "prefill_ms": 99500,
+          "generated": 50,
+          "decode_ms": 2465
+        },
+        {
+          "prompt": 250186,
+          "reused": 250169,
+          "read": 17,
+          "prefill_ms": 324,
+          "generated": 33,
+          "decode_ms": 1508
+        }
+      ],
+      "engine_prompt_tokens_read": 250136,
+      "engine_prefill_ms": 99824,
+      "engine_prefill_tokens_per_s": 2505.77,
+      "engine_generated_tokens": 83,
+      "engine_decode_ms": 3973,
+      "engine_decode_tokens_per_s": 20.891,
+      "finish_reason": "length",
+      "engine_log_excerpt": [
+        "maya ds4 serve: prompt 250119 tokens = 0 reused + 250119 read in 99500 ms (2513.8 tok/s), 50 generated in 2465 ms (20.29 tok/s); CPU lane 0.0% of the experts",
+        "maya ds4 serve: prompt 250186 tokens = 250169 reused + 17 read in 324 ms (52.5 tok/s), 33 generated in 1508 ms (21.89 tok/s); CPU lane 0.1% of the experts"
+      ]
+    }
+  ],
+  "caveats": [
+    "Engine timing rows are specific to this Strata DeepSeek engine build; compare only with the same engine, quantization, settings, prompt size, context, and cache policy.",
+    "This synthetic code-review workload measures performance, not code quality.",
+    "API completion usage can differ from engine subcall generated-token counts because the engine may make multiple internal generation passes; both are recorded."
+  ]
+}

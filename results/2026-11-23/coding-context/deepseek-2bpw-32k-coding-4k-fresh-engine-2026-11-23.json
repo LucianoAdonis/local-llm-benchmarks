@@ -1,0 +1,140 @@
+{
+  "schema": "strata-deepseek-engine-coding-benchmark-v1",
+  "started_at_utc": "2026-11-23T14:06:23.682360+00:00",
+  "model": "deepseek-v4.1-flash",
+  "profile": "deepseek-coding-32k",
+  "configured_context_tokens": 32768,
+  "workload": "synthetic multi-file Python code review; every section is unique per run to avoid prompt-cache reuse",
+  "sections_per_request": 35,
+  "max_output_tokens": 100,
+  "temperature": 0,
+  "metrics": "engine-reported prompt-read and generation milliseconds/tokens, plus API-reported prompt/completion token counts",
+  "summary": {
+    "median_api_prompt_tokens": 4494,
+    "median_engine_prefill_tokens_per_s": 838.009,
+    "median_engine_decode_tokens_per_s": 26.861,
+    "median_client_first_content_s": 7.3229,
+    "median_client_request_wall_s": 8.5309
+  },
+  "runs": [
+    {
+      "run": 1,
+      "sections": 35,
+      "api_prompt_tokens": 4494,
+      "api_completion_tokens": 100,
+      "client_time_to_first_content_s": 7.4172,
+      "client_request_wall_s": 8.632,
+      "engine_passes": [
+        {
+          "prompt": 4494,
+          "reused": 0,
+          "read": 4494,
+          "prefill_ms": 5202,
+          "generated": 50,
+          "decode_ms": 1875
+        },
+        {
+          "prompt": 4561,
+          "reused": 4544,
+          "read": 17,
+          "prefill_ms": 304,
+          "generated": 33,
+          "decode_ms": 1215
+        }
+      ],
+      "engine_prompt_tokens_read": 4511,
+      "engine_prefill_ms": 5506,
+      "engine_prefill_tokens_per_s": 819.288,
+      "engine_generated_tokens": 83,
+      "engine_decode_ms": 3090,
+      "engine_decode_tokens_per_s": 26.861,
+      "finish_reason": "length",
+      "engine_log_excerpt": [
+        "ds4 slots: saved a 4280-token conversation (0.02 GB in RAM in 0.0 s); 4 in RAM, 2 in <USER_HOME>\\AppData\\Local\\Strata\\install\\ds4-slots",
+        "maya ds4 serve: prompt 4494 tokens = 0 reused + 4494 read in 5202 ms (863.8 tok/s), 50 generated in 1875 ms (26.66 tok/s); CPU lane 1.1% of the experts",
+        "maya ds4 serve: prompt 4561 tokens = 4544 reused + 17 read in 304 ms (55.9 tok/s), 33 generated in 1215 ms (27.17 tok/s); CPU lane 1.2% of the experts"
+      ]
+    },
+    {
+      "run": 2,
+      "sections": 35,
+      "api_prompt_tokens": 4494,
+      "api_completion_tokens": 100,
+      "client_time_to_first_content_s": 7.3229,
+      "client_request_wall_s": 8.5309,
+      "engine_passes": [
+        {
+          "prompt": 4494,
+          "reused": 0,
+          "read": 4494,
+          "prefill_ms": 5084,
+          "generated": 50,
+          "decode_ms": 1921
+        },
+        {
+          "prompt": 4561,
+          "reused": 4544,
+          "read": 17,
+          "prefill_ms": 299,
+          "generated": 33,
+          "decode_ms": 1208
+        }
+      ],
+      "engine_prompt_tokens_read": 4511,
+      "engine_prefill_ms": 5383,
+      "engine_prefill_tokens_per_s": 838.009,
+      "engine_generated_tokens": 83,
+      "engine_decode_ms": 3129,
+      "engine_decode_tokens_per_s": 26.526,
+      "finish_reason": "length",
+      "engine_log_excerpt": [
+        "ds4 slots: saved a 4593-token conversation (0.02 GB in RAM in 0.0 s); 4 in RAM, 3 in <USER_HOME>\\AppData\\Local\\Strata\\install\\ds4-slots",
+        "maya ds4 serve: prompt 4494 tokens = 0 reused + 4494 read in 5084 ms (884.0 tok/s), 50 generated in 1921 ms (26.03 tok/s); CPU lane 1.1% of the experts",
+        "maya ds4 serve: prompt 4561 tokens = 4544 reused + 17 read in 299 ms (56.8 tok/s), 33 generated in 1208 ms (27.32 tok/s); CPU lane 1.2% of the experts"
+      ]
+    },
+    {
+      "run": 3,
+      "sections": 35,
+      "api_prompt_tokens": 4494,
+      "api_completion_tokens": 100,
+      "client_time_to_first_content_s": 7.2219,
+      "client_request_wall_s": 8.3528,
+      "engine_passes": [
+        {
+          "prompt": 4494,
+          "reused": 0,
+          "read": 4494,
+          "prefill_ms": 5062,
+          "generated": 50,
+          "decode_ms": 1842
+        },
+        {
+          "prompt": 4561,
+          "reused": 4544,
+          "read": 17,
+          "prefill_ms": 297,
+          "generated": 33,
+          "decode_ms": 1131
+        }
+      ],
+      "engine_prompt_tokens_read": 4511,
+      "engine_prefill_ms": 5359,
+      "engine_prefill_tokens_per_s": 841.762,
+      "engine_generated_tokens": 83,
+      "engine_decode_ms": 2973,
+      "engine_decode_tokens_per_s": 27.918,
+      "finish_reason": "length",
+      "engine_log_excerpt": [
+        "ds4 slots: saved a 4593-token conversation (0.02 GB in RAM in 0.0 s); 4 in RAM, 4 in <USER_HOME>\\AppData\\Local\\Strata\\install\\ds4-slots",
+        "maya ds4 serve: prompt 4494 tokens = 0 reused + 4494 read in 5062 ms (887.8 tok/s), 50 generated in 1842 ms (27.15 tok/s); CPU lane 1.2% of the experts",
+        "maya ds4 serve: prompt 4561 tokens = 4544 reused + 17 read in 297 ms (57.2 tok/s), 33 generated in 1131 ms (29.19 tok/s); CPU lane 1.2% of the experts"
+      ]
+    }
+  ],
+  "caveats": [
+    "Engine timing rows are specific to this Strata DeepSeek engine build; compare only with the same engine, quantization, settings, prompt size, context, and cache policy.",
+    "This synthetic code-review workload measures performance, not code quality.",
+    "API completion usage can differ from engine subcall generated-token counts because the engine may make multiple internal generation passes; both are recorded."
+  ]
+}

@@ -1,0 +1,101 @@
+{
+  "schema": "strata-deepseek-engine-coding-benchmark-v1",
+  "started_at_utc": "2026-11-23T14:39:22.358069+00:00",
+  "model": "deepseek-v4.1-flash",
+  "profile": "deepseek-coding-128k",
+  "configured_context_tokens": 131072,
+  "workload": "synthetic multi-file Python code review; every section is unique per run to avoid prompt-cache reuse",
+  "sections_per_request": 400,
+  "max_output_tokens": 100,
+  "temperature": 0,
+  "metrics": "engine-reported prompt-read and generation milliseconds/tokens, plus API-reported prompt/completion token counts",
+  "summary": {
+    "median_api_prompt_tokens": 50119.0,
+    "median_engine_prefill_tokens_per_s": 2318.886,
+    "median_engine_decode_tokens_per_s": 23.14,
+    "median_client_first_content_s": 23.9247,
+    "median_client_request_wall_s": 25.3226
+  },
+  "runs": [
+    {
+      "run": 40,
+      "sections": 400,
+      "api_prompt_tokens": 50119,
+      "api_completion_tokens": 100,
+      "client_time_to_first_content_s": 24.4466,
+      "client_request_wall_s": 25.9353,
+      "engine_passes": [
+        {
+          "prompt": 50119,
+          "reused": 0,
+          "read": 50119,
+          "prefill_ms": 21568,
+          "generated": 50,
+          "decode_ms": 2475
+        },
+        {
+          "prompt": 50186,
+          "reused": 50169,
+          "read": 17,
+          "prefill_ms": 322,
+          "generated": 33,
+          "decode_ms": 1488
+        }
+      ],
+      "engine_prompt_tokens_read": 50136,
+      "engine_prefill_ms": 21890,
+      "engine_prefill_tokens_per_s": 2290.361,
+      "engine_generated_tokens": 83,
+      "engine_decode_ms": 3963,
+      "engine_decode_tokens_per_s": 20.944,
+      "finish_reason": "length",
+      "engine_log_excerpt": [
+        "maya ds4 serve: prompt 50119 tokens = 0 reused + 50119 read in 21568 ms (2323.7 tok/s), 50 generated in 2475 ms (20.20 tok/s); CPU lane 0.2% of the experts",
+        "maya ds4 serve: prompt 50186 tokens = 50169 reused + 17 read in 322 ms (52.7 tok/s), 33 generated in 1488 ms (22.17 tok/s); CPU lane 0.3% of the experts"
+      ]
+    },
+    {
+      "run": 41,
+      "sections": 400,
+      "api_prompt_tokens": 50119,
+      "api_completion_tokens": 100,
+      "client_time_to_first_content_s": 23.4028,
+      "client_request_wall_s": 24.7099,
+      "engine_passes": [
+        {
+          "prompt": 50119,
+          "reused": 0,
+          "read": 50119,
+          "prefill_ms": 21072,
+          "generated": 50,
+          "decode_ms": 1969
+        },
+        {
+          "prompt": 50186,
+          "reused": 50169,
+          "read": 17,
+          "prefill_ms": 286,
+          "generated": 33,
+          "decode_ms": 1307
+        }
+      ],
+      "engine_prompt_tokens_read": 50136,
+      "engine_prefill_ms": 21358,
+      "engine_prefill_tokens_per_s": 2347.411,
+      "engine_generated_tokens": 83,
+      "engine_decode_ms": 3276,
+      "engine_decode_tokens_per_s": 25.336,
+      "finish_reason": "length",
+      "engine_log_excerpt": [
+        "ds4 slots: saved a 50218-token conversation (0.06 GB in RAM in 0.0 s); 1 in RAM, 15 in <USER_HOME>\\AppData\\Local\\Strata\\install\\ds4-slots",
+        "maya ds4 serve: prompt 50119 tokens = 0 reused + 50119 read in 21072 ms (2378.5 tok/s), 50 generated in 1969 ms (25.40 tok/s); CPU lane 0.2% of the experts",
+        "maya ds4 serve: prompt 50186 tokens = 50169 reused + 17 read in 286 ms (59.5 tok/s), 33 generated in 1307 ms (25.26 tok/s); CPU lane 0.2% of the experts"
+      ]
+    }
+  ],
+  "caveats": [
+    "Engine timing rows are specific to this Strata DeepSeek engine build; compare only with the same engine, quantization, settings, prompt size, context, and cache policy.",
+    "This synthetic code-review workload measures performance, not code quality.",
+    "API completion usage can differ from engine subcall generated-token counts because the engine may make multiple internal generation passes; both are recorded."
+  ]
+}

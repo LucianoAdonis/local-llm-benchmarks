@@ -1,0 +1,53 @@
+name: Benchmark submission
+description: Submit a reproducible local model benchmark result
+title: "[Result] <model> on <GPU>"
+labels: ["benchmark-result"]
+body:
+  - type: markdown
+    attributes:
+      value: "Do not paste secrets, local paths, private code, or unredacted logs. Attach sanitized JSON if possible."
+  - type: input
+    id: gpu
+    attributes:
+      label: GPU and VRAM
+      placeholder: "RTX 5090, 32 GB"
+    validations:
+      required: true
+  - type: input
+    id: cpu_ram
+    attributes:
+      label: CPU and system RAM
+      placeholder: "Ryzen 9 9950X3D, 128 GB"
+    validations:
+      required: true
+  - type: input
+    id: model
+    attributes:
+      label: Model, quantization, source revision
+    validations:
+      required: true
+  - type: input
+    id: runtime
+    attributes:
+      label: Runtime and engine versions
+    validations:
+      required: true
+  - type: input
+    id: context
+    attributes:
+      label: Configured context and actual prompt token count
+    validations:
+      required: true
+  - type: textarea
+    id: metrics
+    attributes:
+      label: Prefill, decode, TTFC, wall time, repeats, cache policy
+      description: State whether each speed came from engine logs or client stream timings.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Sanitized JSON or reproduction commands
+    validations:
+      required: true

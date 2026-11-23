@@ -1,0 +1,102 @@
+{
+  "schema": "strata-deepseek-engine-coding-benchmark-v1",
+  "started_at_utc": "2026-11-23T14:16:14.312883+00:00",
+  "model": "deepseek-v4.1-flash",
+  "profile": "deepseek-coding-32k",
+  "configured_context_tokens": 32768,
+  "workload": "synthetic multi-file Python code review; every section is unique per run to avoid prompt-cache reuse",
+  "sections_per_request": 220,
+  "max_output_tokens": 100,
+  "temperature": 0,
+  "metrics": "engine-reported prompt-read and generation milliseconds/tokens, plus API-reported prompt/completion token counts",
+  "summary": {
+    "median_api_prompt_tokens": 27619.0,
+    "median_engine_prefill_tokens_per_s": 1426.506,
+    "median_engine_decode_tokens_per_s": 11.575,
+    "median_client_first_content_s": 23.9791,
+    "median_client_request_wall_s": 26.6104
+  },
+  "runs": [
+    {
+      "run": 4,
+      "sections": 220,
+      "api_prompt_tokens": 27619,
+      "api_completion_tokens": 100,
+      "client_time_to_first_content_s": 24.738,
+      "client_request_wall_s": 27.2855,
+      "engine_passes": [
+        {
+          "prompt": 27619,
+          "reused": 0,
+          "read": 27619,
+          "prefill_ms": 18922,
+          "generated": 50,
+          "decode_ms": 4889
+        },
+        {
+          "prompt": 27686,
+          "reused": 27669,
+          "read": 17,
+          "prefill_ms": 885,
+          "generated": 33,
+          "decode_ms": 2547
+        }
+      ],
+      "engine_prompt_tokens_read": 27636,
+      "engine_prefill_ms": 19807,
+      "engine_prefill_tokens_per_s": 1395.264,
+      "engine_generated_tokens": 83,
+      "engine_decode_ms": 7436,
+      "engine_decode_tokens_per_s": 11.162,
+      "finish_reason": "length",
+      "engine_log_excerpt": [
+        "ds4 slots: saved a 27718-token conversation (0.04 GB in RAM in 0.0 s); 1 in RAM, 12 in <USER_HOME>\\AppData\\Local\\Strata\\install\\ds4-slots",
+        "maya ds4 serve: prompt 27619 tokens = 0 reused + 27619 read in 18922 ms (1459.6 tok/s), 50 generated in 4889 ms (10.23 tok/s); CPU lane 0.4% of the experts",
+        "maya ds4 serve: prompt 27686 tokens = 27669 reused + 17 read in 885 ms (19.2 tok/s), 33 generated in 2547 ms (12.96 tok/s); CPU lane 0.5% of the experts"
+      ]
+    },
+    {
+      "run": 5,
+      "sections": 220,
+      "api_prompt_tokens": 27619,
+      "api_completion_tokens": 100,
+      "client_time_to_first_content_s": 23.2202,
+      "client_request_wall_s": 25.9353,
+      "engine_passes": [
+        {
+          "prompt": 27619,
+          "reused": 0,
+          "read": 27619,
+          "prefill_ms": 18190,
+          "generated": 50,
+          "decode_ms": 4209
+        },
+        {
+          "prompt": 27686,
+          "reused": 27669,
+          "read": 17,
+          "prefill_ms": 768,
+          "generated": 33,
+          "decode_ms": 2715
+        }
+      ],
+      "engine_prompt_tokens_read": 27636,
+      "engine_prefill_ms": 18958,
+      "engine_prefill_tokens_per_s": 1457.749,
+      "engine_generated_tokens": 83,
+      "engine_decode_ms": 6924,
+      "engine_decode_tokens_per_s": 11.987,
+      "finish_reason": "length",
+      "engine_log_excerpt": [
+        "ds4 slots: saved a 27718-token conversation (0.04 GB in RAM in 0.0 s); 2 in RAM, 12 in <USER_HOME>\\AppData\\Local\\Strata\\install\\ds4-slots",
+        "maya ds4 serve: prompt 27619 tokens = 0 reused + 27619 read in 18190 ms (1518.4 tok/s), 50 generated in 4209 ms (11.88 tok/s); CPU lane 0.4% of the experts",
+        "maya ds4 serve: prompt 27686 tokens = 27669 reused + 17 read in 768 ms (22.1 tok/s), 33 generated in 2715 ms (12.16 tok/s); CPU lane 0.5% of the experts"
+      ]
+    }
+  ],
+  "caveats": [
+    "Engine timing rows are specific to this Strata DeepSeek engine build; compare only with the same engine, quantization, settings, prompt size, context, and cache policy.",
+    "This synthetic code-review workload measures performance, not code quality.",
+    "API completion usage can differ from engine subcall generated-token counts because the engine may make multiple internal generation passes; both are recorded."
+  ]
+}

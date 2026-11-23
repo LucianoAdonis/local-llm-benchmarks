@@ -1,0 +1,42 @@
+{
+  "schema": "strata-coding-context-benchmark-v1",
+  "started_at_utc": "2026-11-23T14:35:42.163663+00:00",
+  "endpoint": "<LOCAL_API_URL>/v1/chat/completions",
+  "model": "inkling-2-mini-ud-q4_k_m",
+  "profile": "inkling-q4-32k-draft-off",
+  "configured_context_tokens": 32768,
+  "workload": "synthetic multi-file Python code review",
+  "sections_per_request": 170,
+  "max_output_tokens": 100,
+  "temperature": 0,
+  "measurement": "streaming API usage counts and client-observed first-content/request timing",
+  "summary": {
+    "median_prompt_tokens": 27483,
+    "median_prompt_tokens_per_s_to_first_content": 3128.879,
+    "median_time_to_first_content_s": 8.7837,
+    "median_decode_window_output_tokens_per_s": 105.539,
+    "median_end_to_end_output_tokens_per_s": 10.276
+  },
+  "caveats": [
+    "Prompt throughput is prompt_tokens divided by time to first streamed content; TTFT includes loopback request overhead and any server queueing, so it is a client-observed prefill proxy.",
+    "Decode-window rate is output tokens divided by time from first streamed text to stream end; it is not kernel-only decode speed.",
+    "The generated source excerpts form a repeatable synthetic coding workload, not a quality benchmark or a real repository audit.",
+    "Unique benchmark run identifiers are placed before the source excerpts to reduce prompt-cache reuse across repeats."
+  ],
+  "runs": [
+    {
+      "nonce": 1,
+      "sections": 170,
+      "prompt_tokens": 27483,
+      "completion_tokens": 100,
+      "time_to_first_content_s": 8.7837,
+      "request_wall_s": 9.7312,
+      "decode_window_s": 0.9475,
+      "prompt_tokens_per_s_to_first_content": 3128.879,
+      "output_tokens_per_s_decode_window": 105.539,
+      "output_tokens_per_s_end_to_end": 10.276,
+      "completion_chars": 409,
+      "finish_reason": "length"
+    }
+  ]
+}
