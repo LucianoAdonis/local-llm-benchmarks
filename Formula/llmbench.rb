@@ -4,7 +4,7 @@ class Llmbench < Formula
   desc "Repeatable local LLM runtime benchmark and setup checker"
   homepage "https://github.com/LucianoAdonis/local-llm-benchmarks"
   url "https://github.com/LucianoAdonis/local-llm-benchmarks/releases/download/v0.2.0/llmbench_local-0.2.0-py3-none-any.whl"
-  sha256 "c9444d0859a0e4dbadac19437a9cc6ab73e3809f6e94fb057098327393b2fed9"
+  sha256 "28068d874e40237c1d9742eb46c601473c5925bba200d7390dc46bbd471281aa"
   license "MIT"
   depends_on "python@3.12"
 
