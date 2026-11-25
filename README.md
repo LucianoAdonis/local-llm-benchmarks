@@ -1,10 +1,73 @@
 # Local LLM Hardware Benchmarks
 
-Repeatable local-inference benchmarks for coding workloads. This repository records model, quantization, context depth, prompt ingestion, generation speed, settings, machine details, and per-run JSON so hardware or software changes can be compared later.
+Repeatable speed tests for running language models on your own computer, plus plain-language guides to what the numbers mean. The aim is the kind of test people run on a new PC build: the same scenes every time, the machine recorded, the result checked, two runs compared honestly.
 
-This first public run measures one Windows PC across Strata models from short prompts through a near-full 256K DeepSeek context. It is a performance record, not a model-quality ranking.
+Three things live here:
 
-## Baseline machine
+1. **[`llmbench`](docs/llmbench.md)**, a small tool that measures the speed of the program running your model (Strata, LM Studio and its Bionic app, llama.cpp, Ollama). It needs only Python. It is written for Windows, macOS and Linux; so far it has been checked on macOS only (see [Known limitations](#known-limitations)).
+2. **Guides**: what speed to expect, what limits it, and which settings matter.
+3. **A first baseline** from one Windows PC, measured on 2026-11-23 with the earlier scripts.
+
+## Start here
+
+| If you want to… | Read |
+|---|---|
+| understand local LLM speed from scratch: what speed to expect from Strata, LM Studio, llama.cpp and Ollama, what limits it, and which settings matter | [docs/start-here.md](docs/start-here.md) |
+| measure your own machine | [docs/llmbench.md](docs/llmbench.md) |
+| see what other people get on similar hardware | [docs/community-baselines.md](docs/community-baselines.md) |
+| know how the test is designed, and what was wrong with the first version | [docs/benchmark-design.md](docs/benchmark-design.md) |
+
+## Measure your own machine
+
+You need Python 3.9 or newer, this repository on your disk (on GitHub: Code, then Download ZIP, and unpack it; or clone it) and a runtime with a model loaded. Open a terminal in the unpacked folder, the one that contains `llmbench`. No Python packages are needed.
+
+macOS and Linux:
+
+```bash
+python3 -m llmbench selftest
+```
+
+```bash
+python3 -m llmbench doctor
+```
+
+```bash
+python3 -m llmbench run --suite quick
+```
+
+Windows:
+
+```powershell
+py -m llmbench selftest
+```
+
+```powershell
+py -m llmbench doctor
+```
+
+```powershell
+py -m llmbench run --suite quick
+```
+
+`selftest` checks the stopwatch code against a fake server with known speeds. `doctor` describes your machine and finds running runtimes. `run` measures reading speed, writing speed and how long typical requests take, and prints the name of the file it saved after `Saved:`.
+
+To compare two runs, name the files yourself with `--output`:
+
+```bash
+python3 -m llmbench run --suite quick --output local-results/before.json
+```
+
+Change one thing (a driver, a runtime version, one setting), run again with `after.json`, then:
+
+```bash
+python3 -m llmbench compare local-results/before.json local-results/after.json
+```
+
+On Windows type `py` where these say `python3`. Per-runtime setup, the scenario list and how to read the output are in [docs/llmbench.md](docs/llmbench.md).
+
+## The 2026-11-23 baseline
+
+One Windows PC across Strata models, from short prompts to a near-full 256K DeepSeek context. It is a performance record, not a model-quality ranking.
 
 | Component | Configuration |
 |---|---|
@@ -15,85 +78,102 @@ This first public run measures one Windows PC across Strata models from short pr
 | Storage during run | Kingston FURY Renegade G5 2 TB PCIe 5.0 NVMe in the first CPU-connected M.2 slot (`M2A_CPU`, owner-reported); Crucial T500 had not yet been installed |
 | Strata | 0.2.20 / engine 0.1.66 for Inkling and Qwen; DeepSeek compatibility install 0.2.13 / engine 0.1.59 |
 
-Models were installed locally; this repository contains no model weights. See [the Strata replication playbook](docs/strata-replication.md) and [copy-ready model requests](prompts/model-download-requests.md).
-An AI-assistant-ready procedure is also available as [`skills/strata-local-benchmark/SKILL.md`](skills/strata-local-benchmark/SKILL.md).
+Models were installed locally; this repository contains no model weights.
 
-## Highlights
+These are one day's measurements with the earlier scripts, on repetitive text. They are probably best-case values, and the rows cannot be compared with each other. The notes under the table say why.
 
-| Model / variant | Context profile | Actual prompt tokens | Prefill | Decode |
+| Model / variant | Context profile | Actual prompt tokens | Reading (prefill) | Writing (decode) |
 |---|---:|---:|---:|---:|
 | DeepSeek V4.1 Flash IST-DAS 2.00 bpw | 256K | 250,119 | 2,506 tok/s | 20.9 tok/s |
 | Qwen3.6-35B-A3B UD-Q4_K_XL | 128K | 54,901 | 4,158 tok/s | 92.6 tok/s |
 | Inkling-2-Mini UD-Q4_K_M | 128K | 64,513 | 2,716 tok/s* | 86.5 tok/s* |
 | Inkling-2-Mini SQ-10 | 128K | 64,513 | 3,943 tok/s* | 64.9 tok/s* |
 
-DeepSeek and Qwen speeds are from engine timing logs. Inkling values marked `*` are client-observed stream rates; Inkling prefill is a proxy that includes client/API overhead. See [all results and caveats](results/2026-11-23/README.md).
+DeepSeek and Qwen speeds are the engine's own timings, read from its log. Inkling values marked `*` were timed from outside with a stopwatch, so its reading speed includes request overhead. See [all results and caveats](results/2026-11-23/README.md).
 
-The DeepSeek 256K run read 250,119 prompt tokens plus a 100-token output cap (about 95.5% of its 262,144-token window). It took 102.6 seconds to first text. Long-context speed is therefore a tradeoff: the model continued generating at about 21 tok/s, but reading the prompt took most of the wait.
+The DeepSeek 256K run read 250,119 prompt tokens plus a 100-token output cap (about 95.5% of its 262,144-token window). It took 102.6 seconds to first text.
+
+### Read this before quoting these numbers
+
+A later review ([docs/benchmark-design.md](docs/benchmark-design.md)) recomputed every number from the stored files. The arithmetic is sound and the tables contain no transcription errors. What the review changed is how the rows should be read:
+
+- **The rows above cannot be ranked against each other.** They use two timing methods, and one "128K" label covers three prompt sizes (54,901 and 64,513 tokens above, and 50,119 for a DeepSeek row in the full results). A token is also a different amount of text for each model.
+- **The test text was one Python class repeated hundreds of times.** That is probably close to a best case for engines whose speed depends on content. Other people measured DeepSeek V4.1 Flash 1.2 to 4 times faster on repeated content than on new content. These files cannot say how large the effect is here.
+- **One row includes cached work.** Every DeepSeek 15.1K run reused 3,982 of its 15,119 prompt tokens from the earlier 4.5K runs.
+- **First requests are slower.** The first run read its prompt most slowly in all 16 files that have more than one. The single-run rows are such first requests, and the engine log lines stored with the runs indicate that the 256K run was also the first request after an engine start.
+- **The 27.6K DeepSeek row is an unexplained outlier**, not evidence that a nearly full window halves speed.
+- **No answer text arrived in any Qwen run.** Its 100 generated tokens were most likely thinking, so there is no time-to-first-answer for it.
+
+They remain a fair record of what was measured on that day. New measurements should use `llmbench`, and the two should not be mixed in one table.
 
 ## Models and files
 
 | Model | Parameters | Tested file/quant | Local download size |
 |---|---|---|---:|
 | [DeepSeek V4.1 Flash 1017](https://huggingface.co/ISTA-DASLab/DeepSeek-V4.1-Flash-1017-GSQ-RCO-GGUF) | 763.2B total; 6/384 routed experts active per token | IST-DAS IQ2_XXS backbone, 2.00 bpw, plus Engram and DSpark | 256.81 GB total pack |
-| [Inkling-2-Mini](https://huggingface.co/thinkingmachines/Inkling-2-Mini) | 26.4B total; 3.4B active | [native SQ-10 / SQ-15 / SQ-20](https://huggingface.co/strata-engine/Inkling-2-Mini-Strata); [UD-Q3_K_XL / UD-Q4_K_M GGUF](https://huggingface.co/unsloth/Inkling-2-Mini-GGUF) | 10.47 / 14.35 / 19.35 / 13.63 / 16.61 GB |
+| [Inkling-2-Mini](https://huggingface.co/thinkingmachines/Inkling-2-Mini) | 26.4B total; 3.4B active | [native SQ-10 / SQ-15 / SQ-20](https://huggingface.co/strata-engine/Inkling-2-Mini-Strata); [UD-Q3_K_XL / UD-Q4_K_M GGUF](https://huggingface.co/unsloth/Inkling-2-Mini-GGUF) | SQ-10 10.47 GB, SQ-15 14.35 GB, SQ-20 19.35 GB, UD-Q3_K_XL 13.63 GB, UD-Q4_K_M 16.61 GB |
 | [Qwen3.6-35B-A3B](https://huggingface.co/unsloth/Qwen3.6-35B-A3B-MTP-GGUF) | 35B total; 3B active | [UD-Q4_K_XL MTP GGUF](https://huggingface.co/unsloth/Qwen3.6-35B-A3B-MTP-GGUF/blob/main/Qwen3.6-35B-A3B-UD-Q4_K_XL.gguf) | 22.85 GB |
 
 The file sizes above are measured local downloads; DeepSeek's package includes support files in addition to its 2.00 bpw backbone. See the [model catalog](docs/model-catalog.md) for exact filenames, GB/GiB breakdowns, parameter explanations, and direct file links. Model licenses and acceptable-use terms belong to their publishers.
 
-## Read the results and plan the next tuning step
+## More background
 
 - [How to read tok/s and what to expect on this PC](docs/expected-performance.md)
 - [Quantization primer: 4-bit versus DeepSeek at 2.00 bpw](docs/quantization-primer.md)
 - [Storage topology and planned Kingston-versus-T500 test](docs/storage-follow-up.md)
+- [Strata replication playbook](docs/strata-replication.md) and [copy-ready model requests](prompts/model-download-requests.md)
+- An AI-assistant-ready procedure: [`skills/strata-local-benchmark/SKILL.md`](skills/strata-local-benchmark/SKILL.md)
 
-## Reproduce
+## How the test is designed
 
-1. Install Strata and download the same model variants. Follow [docs/strata-replication.md](docs/strata-replication.md) and use the exact model requests in [prompts/model-download-requests.md](prompts/model-download-requests.md).
-2. Record a clean baseline with Strata's standard suite. Close GPU-heavy programs, start a fresh engine, and save the JSON output.
-3. Run this repository's coding-context harness against Strata's OpenAI-compatible endpoint. The harness records actual token usage, time to first content, request wall time, and client stream decode-window rate.
-4. For DeepSeek and Qwen, optionally collect engine-log timings using the supplied parsers. Label engine timings and client estimates separately.
-5. Keep context capacity, prompt depth, model revision, quantization, Strata/engine versions, driver, cache state, and background load in every comparison.
+- Reading the prompt (prefill) and writing the answer (decode) are separate measurements.
+- The first token of any kind starts the writing clock. Model thinking is output too.
+- Every run gets a random marker and different, varied text, so no cache can reuse earlier work. Cached tokens reported by the runtime are checked, and a "fresh" run that hit a cache is thrown out.
+- Prompts are sized in tokens for each model, not in characters or sections. A configured context window is capacity, not the number of tokens supplied.
+- Engine timings are preferred. Stopwatch figures are labelled as such.
+- One uncounted first read at each size, then repeated runs. Medians with the spread, never a single best run.
+- The machine, power state, runtime and model details are recorded automatically.
+- Every result says whether it is clean, usable with cautions, or invalid.
+- Speed and quality are separate evaluations.
 
-Example (PowerShell, after the profile is running):
+Details and the reasoning are in [docs/benchmark-design.md](docs/benchmark-design.md). The structure borrows conventions from [Strata's benchmark protocol](https://github.com/Niko1221/Strata/blob/main/docs/BENCHMARK_PROTOCOL.md), [llama-benchy](https://github.com/eugr/llama-benchy), [llama.cpp `llama-bench`](https://github.com/ggml-org/llama.cpp/tree/master/tools/llama-bench) and MLPerf Client. The code here is original; no benchmark tool code was copied from those projects.
+
+## Reproducing the v1 baseline
+
+The scripts in `scripts/` produced the 2026-11-23 numbers and are kept so those can be re-derived. They carry the limitations described above; use `llmbench` for anything new.
+
+1. Install Strata and the same model variants: [docs/strata-replication.md](docs/strata-replication.md), [prompts/model-download-requests.md](prompts/model-download-requests.md).
+2. Start one profile and run the matching script against Strata's OpenAI-compatible endpoint. Example (PowerShell):
 
 ```powershell
 python scripts/strata_coding_context_benchmark.py `
   --url http://127.0.0.1:8080/v1/chat/completions `
   --model inkling-2-mini-sq-10 `
-  --sections 100 --runs 3 --max-tokens 100 `
+  --sections 400 --runs 2 --max-tokens 100 `
   --context 131072 --timeout 600 `
   --profile inkling-sq10-128k `
   --output results/my-run.json
 ```
 
-`--sections` controls the synthetic repository size; model tokenizers count the same text differently. Use the reported `prompt_tokens` as the actual input depth. For engine-log timing collection, see [the playbook](docs/strata-replication.md#coding-context-suite).
-
-## Benchmark design
-
-- Keep prompt prefill and token generation as separate measurements.
-- Use unique run markers to reduce accidental prefix-cache reuse; record any tokens the engine says it reused.
-- Report prompt tokens, output tokens, time to first content, total wall time, and per-run values, not only one aggregate speed.
-- Run short, medium, and long prompt depths. A configured context window is capacity; it is not the same as the number of tokens actually supplied.
-- Save raw JSON and report medians/ranges. Use one run only for very expensive near-capacity prompts and label it clearly.
-- Treat speed and quality as separate evaluations.
-
-The structure borrows useful conventions from [Strata's community benchmark protocol](https://github.com/Niko1221/Strata/blob/main/docs/COMMUNITY_BENCHMARKS.md) (per-run JSON, machine/settings metadata, anonymization, comparisons) and the context-depth split used by [llama-benchy](https://github.com/eugr/llama-benchy) (prompt processing versus generation across depths). The harnesses here are original scripts adapted from this machine's experiment; no benchmark tool code was copied from those projects.
+This is the command behind the Inkling SQ-10 128K row (400 sections, 64,513 tokens, two runs). `--sections` controls the synthetic repository size; model tokenizers count the same text differently, so use the reported `prompt_tokens` as the actual input depth. Always pass `--max-tokens 100`: the script's default is 128. For engine-log timing collection, see [the playbook](docs/strata-replication.md#5-run-the-coding-context-suite). The DeepSeek rows can only be reproduced on Strata 0.2.13, the last release that ran that model.
 
 ## Known limitations
 
-- The Reddit RTX 5090 / 9950X3D DeepSeek comparison uses a different mixed quant and a custom llama.cpp patch. Its reported 256K results are orientation only, not a direct comparison.
-- The DeepSeek GGUF-pack run used Strata 0.2.13 / engine 0.1.59 because the newer local Strata release marked this model retired.
-- Inkling UD-Q4_K_M was run with DSpark disabled due to a current Strata GGUF + DSpark missing-tensor issue ([Strata issue #6762](https://www.stratat.com/en/issues/6762)).
+- The baseline was measured on a repetitive synthetic prompt with the v1 scripts. See "Read this before quoting these numbers" above.
+- The DeepSeek GGUF-pack run used Strata 0.2.13 / engine 0.1.59 because later Strata releases dropped this model.
+- Inkling UD-Q4_K_M was run with DSpark disabled due to a Strata GGUF + DSpark missing-tensor issue ([Strata issue #6762](https://github.com/Niko1221/Strata/issues/6762)).
 - The synthetic code-review input checks serving behavior, not code-review correctness.
-- The initial 82.3 tok/s DeepSeek client-stream estimate was inflated by stream buffering. It is superseded; use the engine-timed JSON results in this repository.
+- An earlier 82.3 tok/s DeepSeek figure is superseded. It came from a token-accounting error: the script divided all 100 billed tokens by the time in which 33 of them were generated. The original explanation, stream buffering, is neither confirmed nor ruled out by the files ([details](docs/benchmark-design.md#what-the-files-show-row-by-row)). Use the engine-timed results.
+- `llmbench` has been run on macOS only so far, against its built-in test server and LM Studio's model listing, not yet against a loaded model. Windows and Linux use the same code. A CI workflow that runs the tests on all three systems is included but has not run yet. If a number looks wrong, please open an issue.
 
 ## Repository layout
 
-- `docs/` — methodology and Strata replication playbook.
-- `prompts/` — copy-ready model install requests and fixed workload prompt description.
-- `scripts/` — benchmark clients, engine-log parsers, and a public-results redactor.
-- `results/2026-11-23/` — sanitized metadata, summary, and per-run JSON.
+- `llmbench/` — the benchmark tool. `tests/` — its unit tests (`python3 -m unittest`, or `py -m unittest` on Windows).
+- `docs/` — guides, community baselines, benchmark design, and the Strata replication playbook.
+- `prompts/` — copy-ready model install requests and the v1 workload description.
+- `scripts/` — the v1 benchmark clients and engine-log parsers (kept for the record) and a results redactor.
+- `results/2026-11-23/` — sanitized metadata, summary, and per-run JSON from the v1 baseline.
+- `local-results/` — where `llmbench` saves by default. Ignored by Git.
 
 ## License and attribution
 

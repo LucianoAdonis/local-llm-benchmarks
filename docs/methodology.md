@@ -1,4 +1,6 @@
-# Methodology
+# Methodology (v1, used for the 2026-11-23 baseline)
+
+> This page describes the method behind the first baseline. A later review found several weaknesses in it. The current method, protocol 2, and the review are in [benchmark-design.md](benchmark-design.md); the tool that implements it is [llmbench](llmbench.md).
 
 ## Questions measured
 
@@ -11,7 +13,7 @@ It also records time to first content and full request wall time because a fast 
 
 ## Workload
 
-The harness builds a deterministic synthetic Python repository from repeated worker modules. Each run includes a unique identifier and asks for a concise, evidence-based engineering review. The exact template is in `scripts/strata_coding_context_benchmark.py` (`make_prompt`). It is designed to scale by section count and avoid leaking real project code.
+The harness builds a deterministic synthetic Python repository from repeated worker modules. Each run includes a run number and asks for a concise, evidence-based engineering review. The template is in `scripts/strata_coding_context_benchmark.py` (`make_prompt`); the two engine-log scripts use a slightly different wording and per-run file names, so Inkling was measured with a different prompt text from DeepSeek and Qwen. It is designed to scale by section count and avoid leaking real project code. The text is highly repetitive, which favours engines whose speed depends on content.
 
 Default controlled settings for the recorded runs:
 
@@ -30,7 +32,7 @@ Default controlled settings for the recorded runs:
 - **Wall time:** request start through stream completion.
 - **Actual context depth:** prompt tokens reported in API usage. Context capacity and actual prompt length are reported separately.
 
-The first 82.3 tok/s DeepSeek client-stream estimate on this machine was inflated by buffering. This repository marks it superseded and uses the engine-log decode result instead.
+The first 82.3 tok/s DeepSeek client-stream estimate on this machine is superseded; the engine-log decode result is used instead. It was first attributed to stream buffering. The stored files show the arithmetic: the engine made two passes (50 tokens generated, then 17 re-read and 33 generated), the API billed 100 completion tokens, and no text reached the client before the second pass. The client formula divided all 100 by the time in which the engine generated 33 (100 ÷ 1.2148 s = 82.3). The files do not record whether the first 50 tokens were hidden thinking or text held back until the second pass, so buffering is neither confirmed nor ruled out. The same client formula produced the Inkling decode figures; their characters per token (3.0 to 4.2) suggest nearly all 100 tokens were visible there, which would make the error small.
 
 ## Repeat and cache policy
 
@@ -40,7 +42,7 @@ The first 82.3 tok/s DeepSeek client-stream estimate on this machine was inflate
 4. Record whether the engine was freshly loaded, whether other GPU work ran, and whether any requests were cached or queued.
 5. Use medians and ranges for repeated runs. Mark single-run near-capacity results as a single observation.
 
-The logs from this DeepSeek engine showed internal prompt-prefix reuse in some 32K runs even though the request marker changed. Those records retain both API prompt size and engine tokens actually read; use the engine read count for prefill calculations.
+The logs from this DeepSeek engine showed prompt-prefix reuse in the three 15.1K runs: 3,982 of 15,119 tokens were taken back from the earlier 4.5K runs. The run marker did not protect against this, because both invocations used markers 1 to 3 and the shorter prompt is a prefix of the longer one. Those records retain both API prompt size and engine tokens actually read; use the engine read count for prefill calculations. The engine also keeps conversations on disk across restarts, so re-running the same commands on the same PC can reuse earlier prompts.
 
 ## Comparison rules
 

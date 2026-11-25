@@ -31,7 +31,7 @@ The pack is much larger than 32 GB of VRAM, so the system relies on Strata's mem
 
 - More aggressive weight compression can alter model behavior and reduce quality on tasks not covered by published evaluations.
 - The complete pack still needs about 257 GB of storage because Engram and DSpark support files are additional and use higher precision.
-- Offloading, SSD access, CPU memory bandwidth, and context length can dominate speed. This run measured about 26.9 tok/s decode at 4.5K input, 23.1 tok/s at 50K input, and 20.9 tok/s after a 250K input. Prompt ingestion ranged from about 838 to 2,506 engine tok/s across those runs, with 102.6 seconds to first content at 250K.
+- Offloading, SSD access, CPU memory bandwidth, and context length can dominate speed. This run measured 26 to 28 tok/s decode at 4.5K and 15.1K input, 25.3 on the second request at 50K, and 20.9 on the two requests that were first after an engine start (50K and 250K). No effect of depth on decode is resolved: depth, profile and being a first request are tangled together. Prompt ingestion fits a per-request cost of roughly 2 to 4 seconds plus a steady rate near 2,600 tok/s, which is why the simple rate rises from 838 tok/s at 4.5K to 2,506 at 250K; time to first content at 250K was 102.6 seconds. All of this was measured on a repetitive prompt, which is probably a best case; see [benchmark-design.md](benchmark-design.md).
 - The user's 4-bit Inkling and Qwen models are different model families; their speed/quality cannot isolate the effect of quantization. This repository does not yet have a same-model DeepSeek 4-bit A/B run.
 
 ## A fair 2-bit versus 4-bit comparison

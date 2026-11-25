@@ -10,8 +10,15 @@
     "storage": "2 TB Kingston FURY Renegade G5 PCIe 5.0 NVMe on C:, owner-reported in CPU-connected M2A_CPU; Crucial T500 4 TB not installed during this run, planned M2D_SB comparison"
   },
   "runtime": {
-    "inkling_qwen": {"strata": "0.2.20", "engine": "0.1.66"},
-    "deepseek": {"strata": "0.2.13", "engine": "0.1.59", "reason": "model retired by the newer local Strata release"}
+    "inkling_qwen": {
+      "strata": "0.2.20",
+      "engine": "0.1.66"
+    },
+    "deepseek": {
+      "strata": "0.2.13",
+      "engine": "0.1.59",
+      "reason": "model retired by the newer local Strata release"
+    }
   },
   "workload": {
     "type": "synthetic multi-file Python code review",
@@ -20,5 +27,6 @@
     "request_concurrency": 1,
     "quality_scored": false
   },
-  "privacy": "Published JSON was sanitized; no model weights, credentials, local engine logs, or real repository source are included."
+  "privacy": "Published JSON was sanitized; no model weights, credentials, full engine logs, or real repository source are included. DeepSeek files carry short engine timing excerpts with paths redacted.",
+  "review": "Reviewed 2026-11-24: see results/2026-11-23/README.md (Review notes) and docs/benchmark-design.md. Produced with the v1 scripts; not comparable with llmbench protocol 2 results."
 }

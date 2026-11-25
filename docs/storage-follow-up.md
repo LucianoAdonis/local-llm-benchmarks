@@ -44,6 +44,8 @@ There is no defensible fixed percentage improvement to promise. The pre-registra
 
 The warm/cold distinction matters: Windows file cache can make a second run look faster even when the SSD did not change. Rebooting or clearing caches changes the test condition; record which method was used and apply the same method to both drives.
 
+Use varied text for this test. With a repetitive prompt the model keeps touching the same few experts and table pages, which stay in memory, so the drive is barely read and any difference between the two SSDs is hidden. `python3 -m llmbench run` uses varied text by default; `--scenarios ctx-16k,repeat-16k` shows how much repetition changes the result on this machine.
+
 ## Sources
 
 - [Gigabyte X870E AORUS PRO ICE specifications](https://www.gigabyte.com/Motherboard/X870E-AORUS-PRO-ICE-rev-10/sp)
