@@ -1,5 +1,7 @@
 # Strata replication playbook
 
+> To measure with the current method on any runtime and operating system, use [llmbench](llmbench.md). This playbook covers installing Strata and reproducing the v1 baseline of 2026-11-23 on Windows.
+
 This is a repeatable, skill-like procedure for preparing Strata, installing the tested model variants, and running the coding-context benchmark. It is written for Windows PowerShell, matching the recorded machine. Strata changes its model catalog and flags over time; verify commands with the installed version’s `--help` before using them.
 
 ## When to use this
@@ -88,7 +90,16 @@ python scripts/strata_coding_context_benchmark.py `
   --output results/my-run.json
 ```
 
-The same workload has about 5.7K API prompt tokens at 35 sections, 16K at 100 sections, and around 50–65K at 400 sections depending on tokenizer. The near-full 32K case used 170 sections for Inkling and produced about 27.5K prompt tokens. Always use actual `prompt_tokens` in the JSON, not the section count.
+A section count is not a token count. Each model splits text differently, and the Inkling runs used the client script, whose sections are slightly shorter (503 characters against 519 in the engine-log scripts). So the baseline used a different number of sections per model to land near the same depth:
+
+| Depth class | Inkling-2-Mini | Qwen3.6-35B-A3B | DeepSeek V4.1 Flash |
+|---|---|---|---|
+| about 5K | 35 sections = 5,748 tokens | 35 = 4,896 | 35 = 4,494 |
+| about 16K | 100 sections = 16,213 tokens | 120 = 16,541 | 120 = 15,119 |
+| near-full 32K | 170 sections = 27,483 tokens | 200 = 27,501 | 220 = 27,619 |
+| 400 sections | 64,513 tokens | 54,901 | 50,119 |
+
+Always use the actual `prompt_tokens` in the JSON, not the section count.
 
 For DeepSeek, use engine-log capture to distinguish backend timings from client streaming:
 
@@ -103,6 +114,11 @@ python scripts/strata_deepseek_engine_benchmark.py `
 ```
 
 For Qwen use `strata_engine_log_coding_benchmark.py` with `--engine-log` set to its run log. For Inkling, use the client harness; its prefill/decode-window values are client estimates rather than raw kernel timings.
+
+Two cautions when re-running these scripts:
+
+- **Use run numbers the engine has not seen.** The DeepSeek engine keeps earlier conversations in RAM and in a `ds4-slots` folder that survives restarts, and a short prompt is a prefix of a longer one with the same run number. Pass `--start-run` with a number not used before (the published 128K and 256K runs used 40, 41 and 60), and check the JSON for `reused` tokens.
+- **Current Strata puts engine timings in the reply**, so log parsing is only needed for the retired DeepSeek engine. `py -m llmbench run --url http://127.0.0.1:8080 --context <profile context>` (on Windows; `python3` elsewhere) reads them directly.
 
 ## 6. Preserve and share results
 
@@ -129,6 +145,6 @@ Read prompt throughput and generation throughput separately. A large context may
 ## Troubleshooting
 
 - **Model retired or missing:** use a Strata version that supports the exact pack, or select a supported current model; record that change as a different configuration.
-- **GGUF + Inkling DSpark missing tensor:** disable DSpark for that profile or use a native `.strata` pack. The recorded UD-Q4_K_M run used DSpark off; see [Strata issue #6762](https://www.stratat.com/en/issues/6762).
+- **GGUF + Inkling DSpark missing tensor:** disable DSpark for that profile or use a native `.strata` pack. The recorded UD-Q4_K_M run used DSpark off; see [Strata issue #6762](https://github.com/Niko1221/Strata/issues/6762).
 - **Out of memory at large context:** stop the runtime, lower context, or choose a smaller pack. Do not repeatedly relaunch the same failing profile without reducing resource demand.
 - **No response from API:** check `strata status`, profile state, API URL, and the Strata engine log. Do not publish the log without redacting paths and credentials.

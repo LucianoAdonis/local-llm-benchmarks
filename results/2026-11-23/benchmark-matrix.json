@@ -1,18 +1,21 @@
 {
   "protocol": "synthetic-coding-context-v1",
+  "note": "Corrected 2026-11-24 to match the per-run JSON files (section counts, the 220-section DeepSeek group, token counts per tokenizer). v1 only; llmbench uses protocol 2.",
   "default_request": {"temperature": 0, "max_output_tokens": 100, "concurrency": 1},
   "context_groups": [
-    {"configured_context": 32768, "sections": 35, "approx_prompt_tokens": 4500, "runs": 3, "models": ["deepseek-v4.1-flash-ist-das-2.00bpw", "inkling-2-mini-sq-10", "inkling-2-mini-sq-15", "inkling-2-mini-sq-20", "inkling-2-mini-ud-q3_k_xl", "inkling-2-mini-ud-q4_k_m", "qwen3.6-35b-a3b-ud-q4_k_xl"]},
-    {"configured_context": 32768, "sections": 100, "approx_prompt_tokens": 16000, "runs": 3, "models": ["deepseek-v4.1-flash-ist-das-2.00bpw", "inkling-2-mini-sq-10", "inkling-2-mini-ud-q4_k_m", "qwen3.6-35b-a3b-ud-q4_k_xl"]},
-    {"configured_context": 32768, "sections": 170, "approx_prompt_tokens": 27500, "runs": 1, "models": ["inkling-2-mini-sq-10", "inkling-2-mini-ud-q4_k_m"]},
-    {"configured_context": 32768, "sections": 200, "approx_prompt_tokens": 27500, "runs": 1, "models": ["qwen3.6-35b-a3b-ud-q4_k_xl"]},
-    {"configured_context": 131072, "sections": 400, "approx_prompt_tokens": "50119-64513 depending on tokenizer", "runs": 2, "models": ["deepseek-v4.1-flash-ist-das-2.00bpw", "inkling-2-mini-sq-10", "inkling-2-mini-ud-q4_k_m", "qwen3.6-35b-a3b-ud-q4_k_xl"]},
-    {"configured_context": 262144, "sections": 2000, "approx_prompt_tokens": 250119, "runs": 1, "models": ["deepseek-v4.1-flash-ist-das-2.00bpw"]}
+    {"configured_context": 32768, "sections": 35, "prompt_tokens": {"deepseek": 4494, "qwen": 4896, "inkling": 5748}, "runs": 3, "models": ["deepseek-v4.1-flash-ist-das-2.00bpw", "inkling-2-mini-sq-10", "inkling-2-mini-sq-15", "inkling-2-mini-sq-20", "inkling-2-mini-ud-q3_k_xl", "inkling-2-mini-ud-q4_k_m", "qwen3.6-35b-a3b-ud-q4_k_xl"]},
+    {"configured_context": 32768, "sections": 100, "prompt_tokens": {"inkling": 16213}, "runs": 3, "models": ["inkling-2-mini-sq-10", "inkling-2-mini-ud-q4_k_m"]},
+    {"configured_context": 32768, "sections": 120, "prompt_tokens": {"deepseek": 15119, "qwen": 16541}, "runs": 3, "models": ["deepseek-v4.1-flash-ist-das-2.00bpw", "qwen3.6-35b-a3b-ud-q4_k_xl"]},
+    {"configured_context": 32768, "sections": 170, "prompt_tokens": {"inkling": 27483}, "runs": 1, "models": ["inkling-2-mini-sq-10", "inkling-2-mini-ud-q4_k_m"]},
+    {"configured_context": 32768, "sections": 200, "prompt_tokens": {"qwen": 27501}, "runs": 1, "models": ["qwen3.6-35b-a3b-ud-q4_k_xl"]},
+    {"configured_context": 32768, "sections": 220, "prompt_tokens": {"deepseek": 27619}, "runs": 2, "models": ["deepseek-v4.1-flash-ist-das-2.00bpw"]},
+    {"configured_context": 131072, "sections": 400, "prompt_tokens": {"deepseek": 50119, "qwen": 54901, "inkling": 64513}, "runs": 2, "models": ["deepseek-v4.1-flash-ist-das-2.00bpw", "inkling-2-mini-sq-10", "inkling-2-mini-ud-q4_k_m", "qwen3.6-35b-a3b-ud-q4_k_xl"]},
+    {"configured_context": 262144, "sections": 2000, "prompt_tokens": {"deepseek": 250119}, "runs": 1, "models": ["deepseek-v4.1-flash-ist-das-2.00bpw"]}
   ],
   "measurement": {
     "preferred": "engine-reported prefill and decode timings",
     "fallback": "client TTFC and stream decode-window; label as proxy",
-    "fresh_context": "unique run marker; report engine-reused tokens",
+    "fresh_context": "run-number marker; report engine-reused tokens",
     "report": "preserve per-run JSON and summarize medians/ranges"
   }
 }

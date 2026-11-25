@@ -1,5 +1,7 @@
 # Reading benchmark results and setting expectations
 
+> New here? [start-here.md](start-here.md) is the plain-language guide, with ceilings, tips and what to expect from each runtime. [community-baselines.md](community-baselines.md) has other people's numbers for comparison. This page covers the 2026-11-23 baseline on one PC.
+
 This file is a quick guide to what the speed numbers mean and what counts as a useful comparison. There is no universal “normal tok/s”: model architecture, quantization, active experts, runtime, prompt length, speculative decoding, context depth, and memory placement all change the result.
 
 ## The four numbers to read
@@ -32,10 +34,10 @@ Machine: Ryzen 9 9950X3D, RTX 5090 32 GB, 128 GB RAM, Windows 11 Pro. These are 
 | Model/build | Prompt depth | Prefill | Decode | What it indicates |
 |---|---:|---:|---:|---|
 | DeepSeek V4.1 Flash IST-DAS 2.00 bpw | 4.5K | 838 tok/s | 26.9 tok/s | Small prompt, 32K profile |
-| DeepSeek V4.1 Flash IST-DAS 2.00 bpw | 15.1K | 1,510 tok/s | 27.2 tok/s | 32K profile; some internal prefix reuse was recorded |
-| DeepSeek V4.1 Flash IST-DAS 2.00 bpw | 27.6K | 1,427 tok/s | 11.6 tok/s | Near-full 32K prompt |
-| DeepSeek V4.1 Flash IST-DAS 2.00 bpw | 50.1K | 2,319 tok/s | 23.1 tok/s | 128K profile |
-| DeepSeek V4.1 Flash IST-DAS 2.00 bpw | 250.1K | 2,506 tok/s | 20.9 tok/s | 256K profile; 102.6 s to first content |
+| DeepSeek V4.1 Flash IST-DAS 2.00 bpw | 15.1K | 1,510 tok/s | 27.2 tok/s | 32K profile; 3,982 of the tokens were reused from cache in every run |
+| DeepSeek V4.1 Flash IST-DAS 2.00 bpw | 27.6K | 1,427 tok/s | 11.6 tok/s | Unexplained outlier; not evidence of a near-full effect; needs a re-run |
+| DeepSeek V4.1 Flash IST-DAS 2.00 bpw | 50.1K | 2,319 tok/s | 23.1 tok/s | 128K profile; 20.9 on the first request, 25.3 on the second |
+| DeepSeek V4.1 Flash IST-DAS 2.00 bpw | 250.1K | 2,506 tok/s | 20.9 tok/s | 256K profile; one run, the first after an engine start; 102.6 s to first content |
 | Qwen3.6-35B-A3B UD-Q4_K_XL | 4.9K | 10,784 tok/s | 309.6 tok/s | 32K profile, engine timing |
 | Qwen3.6-35B-A3B UD-Q4_K_XL | 27.5K | 7,328 tok/s | 163.1 tok/s | Near-full 32K prompt, one run |
 | Qwen3.6-35B-A3B UD-Q4_K_XL | 54.9K | 4,158 tok/s | 92.6 tok/s | 128K profile |
@@ -43,6 +45,13 @@ Machine: Ryzen 9 9950X3D, RTX 5090 32 GB, 128 GB RAM, Windows 11 Pro. These are 
 | Inkling UD-Q4_K_M, DSpark off | 5.7K / 64.5K | client proxy | 119.9 / 86.5 tok/s | 32K / 128K profile; client stream measurements |
 
 The records and full per-run JSON are in [`results/2026-11-23/`](../results/2026-11-23/README.md). For model-specific comparisons, compare matching rows by build and prompt depth. Do not compare Inkling's client estimates to Qwen's engine timings as if they were measured identically.
+
+Three cautions from the later review ([benchmark-design.md](benchmark-design.md)):
+
+- **No effect of depth on DeepSeek's decode is resolved in this data.** The two requests that were first after an engine start wrote 20.9 tok/s (at 50K and at 250K). The second request at 50K wrote 25.3, and the six runs at 4.5K and 15.1K wrote 26.2 to 27.9. Depth, context profile and being a first request are tangled together, so the data cannot say which one matters.
+- **DeepSeek's prefill rate rises with depth largely through amortisation.** The prompt read fits a per-request cost of roughly 2 to 4 seconds plus a steady rate near 2,600 tok/s, so 838 to 2,506 tok/s is not a speed-versus-depth curve.
+- **The 27.6K row is an outlier.** Decode, and a step whose cost does not depend on prompt size, were 2.1 to 2.9 times slower than in every other DeepSeek run, while the 95.5%-full 256K run was normal. The cause is unknown.
+- **The test prompt was repetitive.** For an engine that keeps the most-used experts in fast memory that is probably a best case. These files cannot say by how much.
 
 ## What counts as a meaningful change
 
@@ -67,7 +76,7 @@ To identify what actually helps, tune in this order and change one item per run:
 1. **Stabilize the baseline:** close other GPU-heavy work, keep the same Windows power mode, Strata/engine build, model, context, cache procedure, and output cap. Record GPU temperature, clock, power, VRAM, system RAM, CPU load, and SSD activity.
 2. **Check limits before changing settings:** look for GPU thermal/power throttling, RAM pressure/pagefile activity, SSD temperature/throttling, PCIe link generation/width, and background disk/GPU traffic.
 3. **Measure storage separately:** run an SSD throughput check and the same cold/warm model tasks. A synthetic sequential SSD score does not predict model token speed by itself.
-4. **Tune runtime settings:** only after the storage test, change one Strata option at a time (for example, context, prefill/batch, expert placement, or drafting). Save a separate profile and use `strata bench run` plus this coding-context suite.
+4. **Tune runtime settings:** only after the storage test, change one Strata option at a time (for example, context, prefill/batch, expert placement, or drafting). Save a separate profile and use `strata bench run` plus `python3 -m llmbench run`, then `python3 -m llmbench compare` on the two result files.
 5. **Keep the best verified profile:** compare repeated medians and ranges, and restore the last known-good profile if a change causes instability or worse results.
 
 Record BIOS memory profiles and GPU power settings before adjusting them. This benchmark project does not assume EXPO, overclocking, or undervolting is currently enabled.
