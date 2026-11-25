@@ -140,7 +140,7 @@ def main():
     parser.add_argument("--context", type=int, default=32768)
     parser.add_argument("--timeout", type=int, default=1800)
     parser.add_argument("--profile", default="deepseek-coding-32k")
-    parser.add_argument("--engine-log", default="C:\\Users\\lucia\\AppData\\Local\\Strata\\install\\strata-deepseek-v4.1-flash-ist-das-2.00bpw.log")
+    parser.add_argument("--engine-log", required=True, help="path to the Strata profile's engine log")
     parser.add_argument("--output", required=True)
     args = parser.parse_args()
     if not 1 <= args.runs <= 10 or not 1 <= args.sections <= 2100:

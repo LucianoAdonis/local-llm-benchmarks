@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "llmbench-local"
+version = "0.1.0"
+description = "Repeatable speed tests for local LLM runtimes (Strata, LM Studio, llama.cpp, Ollama, any OpenAI-compatible server)"
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+license-files = ["LICENSE"]
+dependencies = []
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
+    "Topic :: System :: Benchmark",
+]
+
+[project.urls]
+Repository = "https://github.com/LucianoAdonis/local-llm-benchmarks"
+
+[project.scripts]
+llmbench = "llmbench.cli:main"
+
+[tool.setuptools]
+packages = ["llmbench"]
