@@ -71,11 +71,11 @@ On Windows type `py` where these say `python3`. Per-runtime setup, the scenario 
 Python 3.9 or newer is required. Install the released command with `uv` on Windows, macOS, or Linux:
 
 ```sh
-uv tool install git+https://github.com/LucianoAdonis/local-llm-benchmarks.git@v0.1.0
+uv tool install git+https://github.com/LucianoAdonis/local-llm-benchmarks.git@v0.1.1
 llmbench doctor
 ```
 
-`pipx` also works if you already use it: `pipx install git+https://github.com/LucianoAdonis/local-llm-benchmarks.git@v0.1.0`.
+`pipx` also works if you already use it: `pipx install git+https://github.com/LucianoAdonis/local-llm-benchmarks.git@v0.1.1`.
 
 On macOS with Homebrew:
 
@@ -83,7 +83,7 @@ On macOS with Homebrew:
 brew install --formula https://raw.githubusercontent.com/LucianoAdonis/local-llm-benchmarks/main/Formula/llmbench.rb
 ```
 
-The [GitHub release](https://github.com/LucianoAdonis/local-llm-benchmarks/releases) contains the wheel and source archive. The utility checks your computer and local runtime, then benchmarks the loaded model; it leaves model downloads and runtime changes to Strata or LM Studio. See [runtime and model setup](docs/model-setup.md).
+The [GitHub release](https://github.com/LucianoAdonis/local-llm-benchmarks/releases) contains the wheel and source archive. `llmbench doctor` checks your computer and runtime; `llmbench pull --backend bionic --model MODEL@QUANT` explicitly delegates a model download to LM Studio. Strata pack downloads stay in Strata's guided setup. See [runtime and model setup](docs/model-setup.md).
 
 ## The 2026-11-23 baseline
 
@@ -188,7 +188,7 @@ This is the command behind the Inkling SQ-10 128K row (400 sections, 64,513 toke
 - Inkling UD-Q4_K_M was run with DSpark disabled due to a Strata GGUF + DSpark missing-tensor issue ([Strata issue #6762](https://github.com/Niko1221/Strata/issues/6762)).
 - The synthetic code-review input checks serving behavior, not code-review correctness.
 - An earlier 82.3 tok/s DeepSeek figure is superseded. It came from a token-accounting error: the script divided all 100 billed tokens by the time in which 33 of them were generated. The original explanation, stream buffering, is neither confirmed nor ruled out by the files ([details](docs/benchmark-design.md#what-the-files-show-row-by-row)). Use the engine-timed results.
-- `llmbench` has now been run on Windows against a loaded Strata model, and its 151 unit tests pass locally on Windows. The macOS smoke run used the built-in test server and LM Studio's model listing; Linux remains to be confirmed by CI. If a number looks wrong, please open an issue.
+- `llmbench` has now been run on Windows against loaded Strata models, and its 153 unit tests pass locally on Windows. The macOS and Linux CI jobs pass; real-model runs on those systems remain follow-up work. If a number looks wrong, please open an issue.
 
 ## Repository layout
 

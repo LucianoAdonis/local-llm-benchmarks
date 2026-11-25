@@ -4,9 +4,9 @@
 
 - **One tool for Windows, macOS and Linux.** It is plain Python (3.9 or newer) with no packages to install.
 - **Any runtime.** It talks to the local web address that Strata, LM Studio (and Bionic), llama.cpp and Ollama all serve for other apps (the "OpenAI-compatible" API).
-- **It does not download models or change settings.** Load your model the way you normally do first. If none is loaded, LM Studio and Ollama load one on the tool's first request, with their default context window, and the tool tells you so.
+- **It does not silently download models or change runtime settings.** Load your model the way you normally do first. The explicit `llmbench pull` command delegates a Bionic/LM Studio download to `lms get`; Strata-managed model packs are downloaded through Strata.
 
-**Status:** so far `llmbench` has been run on macOS only, against its built-in test server, not yet against a loaded model. Windows and Linux use the same code and have automated tests that have not run there yet. If a number looks wrong, please open an issue.
+**Status:** the quick suite has been run against loaded Strata models on Windows, and the self-test has passed locally. CI also runs unit tests and package checks on Windows, macOS, and Linux. The current real-model reference run is in [results/2026-11-25](../results/2026-11-25/README.md); Mac and Linux still need real-model runs. If a number looks wrong, please open an issue.
 
 If the words below are new, read [start-here.md](start-here.md) first. The reasoning behind each design choice is in [benchmark-design.md](benchmark-design.md).
 

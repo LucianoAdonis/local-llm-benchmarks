@@ -9,6 +9,8 @@ import datetime as dt
 import glob
 import json
 import os
+import shutil
+import subprocess
 import sys
 import time
 from pathlib import Path
@@ -344,6 +346,18 @@ def cmd_scenarios(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_pull(args: argparse.Namespace) -> int:
+    """Delegate an explicitly requested LM Studio model download to its native CLI."""
+    lms = shutil.which("lms")
+    if not lms:
+        raise CliError("LM Studio's `lms` command was not found. Install/open LM Studio or use its Local Models screen; see docs/model-setup.md.")
+    print("Starting the requested download through LM Studio's native model manager.")
+    try:
+        return subprocess.run([lms, "get", args.model], check=False).returncode
+    except OSError as exc:
+        raise CliError("could not start `lms get`: %s" % exc) from None
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="llmbench", description="Repeatable speed tests for local LLM runtimes (Strata, LM Studio, llama.cpp, Ollama and any OpenAI-compatible server).")
     parser.add_argument("--version", action="version", version="llmbench %s (protocol %s)" % (__version__, PROTOCOL_VERSION))
@@ -353,6 +367,11 @@ def build_parser() -> argparse.ArgumentParser:
     doctor.add_argument("--url", help="check one address instead of the usual local ports")
     doctor.add_argument("--api-key-env", metavar="VAR", help="environment variable that holds an API key, if your server needs one")
     doctor.set_defaults(func=cmd_doctor)
+
+    pull = sub.add_parser("pull", help="download a Bionic/LM Studio model through its native `lms get` command")
+    pull.add_argument("--backend", choices=("bionic",), default="bionic", help="model manager to use (currently LM Studio/Bionic)")
+    pull.add_argument("--model", required=True, help="model name, optionally with quantization, e.g. llama-3.1-8b@q4_k_m")
+    pull.set_defaults(func=cmd_pull)
 
     run = sub.add_parser("run", help="run a benchmark suite and save a result file")
     run.add_argument("--url", help="server address, e.g. http://127.0.0.1:1234 (found automatically when only one runtime is running)")

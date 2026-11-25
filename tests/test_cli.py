@@ -61,6 +61,21 @@ class InputErrorTest(unittest.TestCase):
             code, text = run_cli(["sanitize", "--check", os.path.join(folder, "*.nothing")])
             self.assertEqual(code, 2)
 
+    @mock.patch("llmbench.cli.subprocess.run")
+    @mock.patch("llmbench.cli.shutil.which", return_value="/tools/lms")
+    def test_pull_delegates_the_model_id_as_a_single_argument(self, which, run):
+        run.return_value.returncode = 0
+        code, text = run_cli(["pull", "--backend", "bionic", "--model", "llama-3.1-8b@q4_k_m; echo unsafe"])
+        self.assertEqual(code, 0)
+        self.assertIn("native model manager", text)
+        run.assert_called_once_with(["/tools/lms", "get", "llama-3.1-8b@q4_k_m; echo unsafe"], check=False)
+
+    @mock.patch("llmbench.cli.shutil.which", return_value=None)
+    def test_pull_explains_when_lms_is_missing(self, which):
+        code, text = run_cli(["pull", "--model", "some-model"])
+        self.assertEqual(code, 2)
+        self.assertIn("`lms` command was not found", text)
+
 
 class SaveTest(unittest.TestCase):
     @classmethod

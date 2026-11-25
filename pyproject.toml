@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "llmbench-local"
-version = "0.1.0"
+version = "0.1.1"
 description = "Repeatable speed tests for local LLM runtimes (Strata, LM Studio, llama.cpp, Ollama, any OpenAI-compatible server)"
 readme = "README.md"
 requires-python = ">=3.9"

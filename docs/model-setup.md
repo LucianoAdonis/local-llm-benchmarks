@@ -1,6 +1,6 @@
 # Install a runtime and model
 
-`llmbench` measures a running local model. It checks the machine and runtime, but it does not download a model or change runtime settings. Model files can be tens or hundreds of gigabytes, so use the runtime's own catalog and confirm the selected quantization before downloading.
+`llmbench` checks the machine and runtime, then measures a running model. It never downloads anything automatically or changes runtime settings. Model files can be tens or hundreds of gigabytes, so confirm the publisher, format, quantization, and disk space first. The explicit `llmbench pull` command delegates LM Studio/Bionic downloads to `lms get`; Strata manages its own model packs and engine support files.
 
 ## Strata
 
@@ -30,8 +30,11 @@ In Bionic, open **Settings → Local Models → Explore**, choose the model form
 ```sh
 lms get
 lms get llama-3.1-8b@q4_k_m
+llmbench pull --backend bionic --model llama-3.1-8b@q4_k_m
 lms ls
 ```
+
+`llmbench pull` requires the bundled `lms` command on `PATH` and forwards its interactive prompts and errors. It runs only when you invoke the command.
 
 Start LM Studio's local server in its Developer tab or run `lms server start`. To pin a context and GPU placement from the terminal:
 

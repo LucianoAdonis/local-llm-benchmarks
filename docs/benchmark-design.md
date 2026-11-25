@@ -167,8 +167,8 @@ Flags are listed in [llmbench.md](llmbench.md#result-quality-and-flags).
 ### How the tool itself is checked
 
 - `python3 -m llmbench selftest` runs the client against the fake server in a separate process and fails if writing speed is off by more than 4% or the first token by more than 40 ms. On a quiet machine the errors were under 0.5% and about 1 ms.
-- More than 120 unit tests cover the workload hashes, every metric formula, the stream classifier (separate thinking fields, inline think tags, tags split across events), runtime detection, the engine-log parser, the redactor and full suite runs. They pass on Python 3.9, 3.10 and 3.12 on macOS.
-- A CI workflow is included that runs the same tests on Windows, macOS and Linux for every change. It has not run yet, because nothing has been pushed since it was added.
+- 153 unit tests cover the workload hashes, every metric formula, the stream classifier (separate thinking fields, inline think tags, tags split across events), runtime detection, the engine-log parser, the redactor, model-pull delegation, and full suite runs. They pass locally on Windows Python 3.14; CI has also passed on Windows, macOS, and Linux with Python 3.9 and 3.13.
+- The CLI has been benchmarked against loaded Strata Inkling and Qwen models on one Windows PC. The new diverse-corpus measurements are documented separately from the older repeated-text baseline.
 
 ### Known limits
 
@@ -180,7 +180,7 @@ Flags are listed in [llmbench.md](llmbench.md#result-quality-and-flags).
 - Model files are not hashed, because the tool only sees the server. Note the exact file in `--label`.
 - Prompts are matched in tokens. That is the right comparison for one model file on different runtimes, where tokens are identical. Between different models a token is a different amount of text, so compare seconds for the same job, or characters per second: the result stores how many characters this model counts per token.
 - The number of runs is fixed. A rule that keeps running until the median is known to a target width would suit noisy setups better.
-- The tool has been checked against its own fake server on macOS only so far: not yet against a loaded model, and not yet on Windows or Linux.
+- Real-model validation is currently from one Windows PC with Strata. Model runs on macOS and Linux remain open follow-up work; unit and package CI passes on all three operating systems.
 
 ## Part 3. Existing tools, and why this one
 

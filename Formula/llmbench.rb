@@ -3,8 +3,8 @@ class Llmbench < Formula
 
   desc "Repeatable local LLM runtime benchmark and setup checker"
   homepage "https://github.com/LucianoAdonis/local-llm-benchmarks"
-  url "https://github.com/LucianoAdonis/local-llm-benchmarks/releases/download/v0.1.0/llmbench_local-0.1.0-py3-none-any.whl"
-  sha256 "2ab1441c16e872d5047ab7a798b954048b832c6790a89be5c195ed900137ccdb"
+  url "https://github.com/LucianoAdonis/local-llm-benchmarks/releases/download/v0.1.1/llmbench_local-0.1.1-py3-none-any.whl"
+  sha256 "TO_BE_FILLED_FROM_RELEASE_WHEEL"
   license "MIT"
   depends_on "python@3.12"
 
@@ -15,6 +15,6 @@ class Llmbench < Formula
   end
 
   test do
-    assert_match "llmbench 0.1.0", shell_output("#{bin}/llmbench --version")
+    assert_match "llmbench 0.1.1", shell_output("#{bin}/llmbench --version")
   end
 end
