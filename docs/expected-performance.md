@@ -1,6 +1,6 @@
 # Reading benchmark results and setting expectations
 
-> New here? [start-here.md](start-here.md) is the plain-language guide, with ceilings, tips and what to expect from each runtime. [community-baselines.md](community-baselines.md) has other people's numbers for comparison. This page covers the 2026-11-23 baseline on one PC.
+> New here? [start-here.md](start-here.md) is the plain-language guide, with ceilings, tips and what to expect from each runtime. [community-baselines.md](community-baselines.md) has other people's numbers for comparison. This page covers the 2026-11-23 baseline and later PC iterations.
 
 This file is a quick guide to what the speed numbers mean and what counts as a useful comparison. There is no universal “normal tok/s”: model architecture, quantization, active experts, runtime, prompt length, speculative decoding, context depth, and memory placement all change the result.
 
@@ -52,6 +52,10 @@ Three cautions from the later review ([benchmark-design.md](benchmark-design.md)
 - **DeepSeek's prefill rate rises with depth largely through amortisation.** The prompt read fits a per-request cost of roughly 2 to 4 seconds plus a steady rate near 2,600 tok/s, so 838 to 2,506 tok/s is not a speed-versus-depth curve.
 - **The 27.6K row is an outlier.** Decode, and a step whose cost does not depend on prompt size, were 2.1 to 2.9 times slower than in every other DeepSeek run, while the 95.5%-full 256K run was normal. The cause is unknown.
 - **The test prompt was repetitive.** For an engine that keeps the most-used experts in fast memory that is probably a best case. These files cannot say by how much.
+
+## 2026-11-25 update
+
+On the same PC, Strata 0.2.21.1 / engine 0.1.67's native suite measured Inkling SQ-10 at 168.8 tok/s around a 3.4K prompt (report marked nonconforming) and Qwen3.6 UD-Q4_K_XL at 186.1 tok/s around a 4.1K prompt (complete report). The diverse-corpus `llmbench` quick suite measured Inkling SQ-10 at **195 tok/s** around 3.5K and **168 tok/s** around 14.5K, with **7,121 tok/s** read speed at the larger depth. Qwen3.6 UD-Q4_K_XL measured **284 tok/s** around 3.4K and **215 tok/s** around 14.6K, reading at **9,626 tok/s** at the larger depth. Both reports say Strata emitted hidden thinking tokens; the Qwen run also reached 97% VRAM use. Treat its rate as generated tokens, not visible answer text, and use a lower-context follow-up to check memory pressure. See the [iteration record](../results/2026-11-25/README.md); the three methods and workloads should not be treated as one direct ranking.
 
 ## What counts as a meaningful change
 

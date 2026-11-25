@@ -1,0 +1,72 @@
+{
+  "schema": "llmb-coding-context-benchmark-v1",
+  "started_at_utc": "2026-11-25T16:30:07.144313+00:00",
+  "endpoint": "/api/v1/chat (loopback address redacted)",
+  "model": "llmb-bionic-inkling-q4",
+  "runtime": "bionic",
+  "configured_context_tokens": 32768,
+  "workload": "synthetic multi-file Python code review",
+  "sections_per_request": 35,
+  "max_output_tokens": 100,
+  "temperature": 0,
+  "measurement": "LM Studio native stats for /api/v1/chat; otherwise OpenAI-compatible usage with client-side streaming timings",
+  "summary": {
+    "median_prompt_tokens": 5749,
+    "median_prompt_tokens_per_s_to_first_content": 1733.469,
+    "median_time_to_first_content_s": 3.3165,
+    "median_decode_tokens_per_s": 74.542,
+    "median_end_to_end_tokens_per_s": 21.038
+  },
+  "caveats": [
+    "Decode tok/s and TTFC come from LM Studio native stats; prompt tok/s is prompt tokens divided by TTFC, and end-to-end tok/s uses client wall time.",
+    "Synthetic source is a repeatable load, not a coding-quality evaluation.",
+    "Compare matching model builds, runtimes, context depths, and cold/warm cache states."
+  ],
+  "runs": [
+    {
+      "run_id": "ebfcc942-1",
+      "prompt_tokens": 5747,
+      "completion_tokens": 100,
+      "time_to_first_content_s": 3.3443,
+      "request_wall_s": 4.878,
+      "decode_window_s": 1.3601,
+      "prompt_tokens_per_s_to_first_content": 1718.459,
+      "output_tokens_per_s_decode_window": 73.526,
+      "client_decode_rate_quality": "LM Studio native API stats",
+      "stream_content_events": 98,
+      "output_tokens_per_s_end_to_end": 20.5,
+      "completion_chars": 357,
+      "model_load_time_s": null
+    },
+    {
+      "run_id": "a729e4c5-2",
+      "prompt_tokens": 5750,
+      "completion_tokens": 100,
+      "time_to_first_content_s": 3.3068,
+      "request_wall_s": 4.7511,
+      "decode_window_s": 1.3415,
+      "prompt_tokens_per_s_to_first_content": 1738.823,
+      "output_tokens_per_s_decode_window": 74.542,
+      "client_decode_rate_quality": "LM Studio native API stats",
+      "stream_content_events": 98,
+      "output_tokens_per_s_end_to_end": 21.048,
+      "completion_chars": 357,
+      "model_load_time_s": null
+    },
+    {
+      "run_id": "31403ed0-3",
+      "prompt_tokens": 5749,
+      "completion_tokens": 100,
+      "time_to_first_content_s": 3.3165,
+      "request_wall_s": 4.7532,
+      "decode_window_s": 1.3297,
+      "prompt_tokens_per_s_to_first_content": 1733.469,
+      "output_tokens_per_s_decode_window": 75.203,
+      "client_decode_rate_quality": "LM Studio native API stats",
+      "stream_content_events": 98,
+      "output_tokens_per_s_end_to_end": 21.038,
+      "completion_chars": 357,
+      "model_load_time_s": null
+    }
+  ]
+}

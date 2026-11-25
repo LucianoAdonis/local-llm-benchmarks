@@ -1,6 +1,7 @@
 __pycache__/
 *.py[cod]
 .venv/
+*.egg-info/
 venv/
 .env
 .env.*
@@ -11,3 +12,13 @@ venv/
 *.pt
 *.bin
 local-results/
+build/
+dist/
+
+# Raw Strata reports can include machine paths and generated model output.
+/results/2026-11-25/strata-standard-*/
+
+# Exploratory Strata client-stream estimates were superseded by native timings.
+/results/2026-11-25/inkling-sq10-strata-0.2.20-32k.json
+/results/2026-11-25/inkling-sq10-strata-engine-0.1.67-32k.json
+/results/2026-11-25/inkling-sq10-strata-engine-0.1.67-stream-check.json

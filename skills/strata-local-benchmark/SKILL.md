@@ -24,7 +24,7 @@ Use this runbook when the user wants a Strata setup, model-download plan, or rep
 
 ## Workflow
 
-1. Read `docs/strata-replication.md` and `prompts/model-download-requests.md`.
+1. Install `llmbench` with the steps in `docs/model-setup.md`, then run `llmbench doctor` to capture the machine and runtime baseline. Read `docs/strata-replication.md` and `prompts/model-download-requests.md`.
 2. Install Strata from its official release path and confirm `strata --version`, `strata doctor`, and `strata models list`.
 3. Select the exact model variant from a managed Strata catalog or the linked model card. For pack formats, install all required support files. Do not substitute a similarly named quantization.
 4. Create a new named profile for each context size. Preserve the original profile and verify config/model paths before loading it.

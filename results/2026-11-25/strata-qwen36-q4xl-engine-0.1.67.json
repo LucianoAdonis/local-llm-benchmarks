@@ -1,0 +1,120 @@
+{
+  "schema": "llmb-strata-native-benchmark-v1",
+  "runtime": "strata",
+  "model": "qwen3.6-35b-a3b-ud-q4_k_xl",
+  "engine": "0.1.67",
+  "configured_context_tokens": 32768,
+  "protocol_status": "complete",
+  "measurement": "Strata engine-reported standard-suite timings",
+  "summary": {
+    "median_decode_tokens_per_s": 186.100611,
+    "median_prompt_tokens_per_s_to_first_content": 10403.184386,
+    "median_time_to_first_content_s": 0.422,
+    "median_prompt_tokens": 4051
+  },
+  "cases": {
+    "short": {
+      "prompt_tps": {
+        "median": 841.346154,
+        "min": 819.672131,
+        "max": 864.197531,
+        "n": 3
+      },
+      "decode_tps": {
+        "median": 221.061267,
+        "min": 220.205583,
+        "max": 222.386309,
+        "n": 3
+      },
+      "ttft_s": {
+        "median": 0.078,
+        "min": 0.047,
+        "max": 0.078,
+        "n": 3
+      },
+      "first_answer_s": {
+        "median": null,
+        "min": null,
+        "max": null,
+        "n": 0
+      },
+      "total_s": {
+        "median": 2.375,
+        "min": 2.375,
+        "max": 2.39,
+        "n": 3
+      },
+      "median_prompt_tokens": 35
+    },
+    "prompt-4k": {
+      "prompt_tps": {
+        "median": 10403.184386,
+        "min": 9992.599901,
+        "max": 10416.559527,
+        "n": 3
+      },
+      "decode_tps": {
+        "median": 186.100611,
+        "min": 186.005958,
+        "max": 187.945085,
+        "n": 3
+      },
+      "ttft_s": {
+        "median": 0.422,
+        "min": 0.422,
+        "max": 0.438,
+        "n": 3
+      },
+      "first_answer_s": {
+        "median": null,
+        "min": null,
+        "max": null,
+        "n": 0
+      },
+      "total_s": {
+        "median": 3.172,
+        "min": 3.157,
+        "max": 3.172,
+        "n": 3
+      },
+      "median_prompt_tokens": 4051
+    },
+    "prompt-16k": {
+      "prompt_tps": {
+        "median": 8830.361967,
+        "min": 8803.727243,
+        "max": 8911.241958,
+        "n": 3
+      },
+      "decode_tps": {
+        "median": 164.842241,
+        "min": 164.318495,
+        "max": 165.065446,
+        "n": 3
+      },
+      "ttft_s": {
+        "median": 1.875,
+        "min": 1.859,
+        "max": 1.875,
+        "n": 3
+      },
+      "first_answer_s": {
+        "median": null,
+        "min": null,
+        "max": null,
+        "n": 0
+      },
+      "total_s": {
+        "median": 4.984,
+        "min": 4.969,
+        "max": 4.984,
+        "n": 3
+      },
+      "median_prompt_tokens": 16345
+    }
+  },
+  "caveats": [
+    "See the sibling results.json and README.md for protocol conformance, excluded requests, and per-run evidence.",
+    "Strata's standard suite uses its own fixed prompts; it is not the same workload as llmb bench."
+  ]
+}

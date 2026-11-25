@@ -135,6 +135,8 @@ class GpuSampler:
             pass
         if self.thread:
             self.thread.join(timeout=2)
+        if self.proc.stdout:
+            self.proc.stdout.close()
         self.proc = None
         if not self.samples:
             return None

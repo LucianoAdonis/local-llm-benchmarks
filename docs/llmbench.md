@@ -10,6 +10,8 @@
 
 If the words below are new, read [start-here.md](start-here.md) first. The reasoning behind each design choice is in [benchmark-design.md](benchmark-design.md).
 
+For packaged installation and model downloads through the native runtime tools, see [model-setup.md](model-setup.md). `llmbench` never downloads large model files or changes a runtime configuration on its own.
+
 ## Quick start
 
 **Commands on this page are written `python3 -m llmbench`. On Windows, type `py` instead of `python3`.**

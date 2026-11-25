@@ -4,7 +4,7 @@ Repeatable speed tests for running language models on your own computer, plus pl
 
 Three things live here:
 
-1. **[`llmbench`](docs/llmbench.md)**, a small tool that measures the speed of the program running your model (Strata, LM Studio and its Bionic app, llama.cpp, Ollama). It needs only Python. It is written for Windows, macOS and Linux; so far it has been checked on macOS only (see [Known limitations](#known-limitations)).
+1. **[`llmbench`](docs/llmbench.md)**, a small tool that measures the speed of the program running your model (Strata, LM Studio and its Bionic app, llama.cpp, Ollama). It needs only Python. It is written for Windows, macOS and Linux; the latest Windows PC run is recorded below.
 2. **Guides**: what speed to expect, what limits it, and which settings matter.
 3. **A first baseline** from one Windows PC, measured on 2026-11-23 with the earlier scripts.
 
@@ -16,6 +16,7 @@ Three things live here:
 | measure your own machine | [docs/llmbench.md](docs/llmbench.md) |
 | see what other people get on similar hardware | [docs/community-baselines.md](docs/community-baselines.md) |
 | know how the test is designed, and what was wrong with the first version | [docs/benchmark-design.md](docs/benchmark-design.md) |
+| install Strata, Bionic, or a model | [docs/model-setup.md](docs/model-setup.md) |
 
 ## Measure your own machine
 
@@ -65,6 +66,25 @@ python3 -m llmbench compare local-results/before.json local-results/after.json
 
 On Windows type `py` where these say `python3`. Per-runtime setup, the scenario list and how to read the output are in [docs/llmbench.md](docs/llmbench.md).
 
+## Install as a command
+
+Python 3.9 or newer is required. Install the released command with `uv` on Windows, macOS, or Linux:
+
+```sh
+uv tool install git+https://github.com/LucianoAdonis/local-llm-benchmarks.git@v0.1.0
+llmbench doctor
+```
+
+`pipx` also works if you already use it: `pipx install git+https://github.com/LucianoAdonis/local-llm-benchmarks.git@v0.1.0`.
+
+On macOS with Homebrew:
+
+```sh
+brew install --formula https://raw.githubusercontent.com/LucianoAdonis/local-llm-benchmarks/main/Formula/llmbench.rb
+```
+
+The [GitHub release](https://github.com/LucianoAdonis/local-llm-benchmarks/releases) contains the wheel and source archive. The utility checks your computer and local runtime, then benchmarks the loaded model; it leaves model downloads and runtime changes to Strata or LM Studio. See [runtime and model setup](docs/model-setup.md).
+
 ## The 2026-11-23 baseline
 
 One Windows PC across Strata models, from short prompts to a near-full 256K DeepSeek context. It is a performance record, not a model-quality ranking.
@@ -105,6 +125,10 @@ A later review ([docs/benchmark-design.md](docs/benchmark-design.md)) recomputed
 - **No answer text arrived in any Qwen run.** Its 100 generated tokens were most likely thinking, so there is no time-to-first-answer for it.
 
 They remain a fair record of what was measured on that day. New measurements should use `llmbench`, and the two should not be mixed in one table.
+
+## The 2026-11-25 PC iteration
+
+Using `llmbench` 0.1.0 on the same Ryzen 9 9950X3D / RTX 5090 PC and Strata 0.2.21.1 / engine 0.1.67, the 32K Inkling SQ-10 run measured **195 tok/s at 3.5K prompt tokens** and **168 tok/s at 14.5K**, with about **7.1K tok/s reading** at the larger depth. Qwen3.6 UD-Q4_K_XL measured **284 tok/s at 3.4K** and **215 tok/s at 14.6K**, with **9.6K tok/s reading** at the larger depth. Each scenario has three runs. Both results carry cautions: Strata reported hidden thinking tokens, and Qwen reached 97% VRAM use. These diverse-corpus quick runs are not direct comparisons to the older repeated-text baseline or Strata's native standard suite. See the [sanitized results and full run details](results/2026-11-25/README.md).
 
 ## Models and files
 
@@ -164,7 +188,7 @@ This is the command behind the Inkling SQ-10 128K row (400 sections, 64,513 toke
 - Inkling UD-Q4_K_M was run with DSpark disabled due to a Strata GGUF + DSpark missing-tensor issue ([Strata issue #6762](https://github.com/Niko1221/Strata/issues/6762)).
 - The synthetic code-review input checks serving behavior, not code-review correctness.
 - An earlier 82.3 tok/s DeepSeek figure is superseded. It came from a token-accounting error: the script divided all 100 billed tokens by the time in which 33 of them were generated. The original explanation, stream buffering, is neither confirmed nor ruled out by the files ([details](docs/benchmark-design.md#what-the-files-show-row-by-row)). Use the engine-timed results.
-- `llmbench` has been run on macOS only so far, against its built-in test server and LM Studio's model listing, not yet against a loaded model. Windows and Linux use the same code. A CI workflow that runs the tests on all three systems is included but has not run yet. If a number looks wrong, please open an issue.
+- `llmbench` has now been run on Windows against a loaded Strata model, and its 151 unit tests pass locally on Windows. The macOS smoke run used the built-in test server and LM Studio's model listing; Linux remains to be confirmed by CI. If a number looks wrong, please open an issue.
 
 ## Repository layout
 
@@ -173,6 +197,9 @@ This is the command behind the Inkling SQ-10 128K row (400 sections, 64,513 toke
 - `prompts/` — copy-ready model install requests and the v1 workload description.
 - `scripts/` — the v1 benchmark clients and engine-log parsers (kept for the record) and a results redactor.
 - `results/2026-11-23/` — sanitized metadata, summary, and per-run JSON from the v1 baseline.
+- `results/2026-11-25/` — sanitized Strata/Bionic engine runs and the first v2 `llmbench` run on the baseline PC.
+- `Formula/` and `.github/workflows/release.yml` — Homebrew formula and tagged wheel/source release.
+- `docs/model-setup.md` — runtime installation and native model download steps.
 - `local-results/` — where `llmbench` saves by default. Ignored by Git.
 
 ## License and attribution
