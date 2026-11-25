@@ -19,6 +19,7 @@ from typing import Any, Dict, List, Optional
 from . import PROTOCOL_VERSION, WORKLOAD_VERSION, __version__
 from . import report, runtimes, sysinfo
 from .bench import DEPTH_CLASSES, SUITE_NAMES, Bench, build_suite, default_output_path, depth_target, followup_target
+from .catalog import MODELS, find_model
 from .client import EndpointError, clean_api_key, split_base_url
 from .sanitize import clean, read_json, register_secret, residue, sanitize_file, write_json
 
@@ -264,6 +265,144 @@ def cmd_report(args: argparse.Namespace) -> int:
     return 0
 
 
+def _config_path() -> Path:
+    if os.name == "nt":
+        base = Path(os.environ.get("APPDATA") or (Path.home() / "AppData" / "Roaming"))
+    elif sys.platform == "darwin":
+        base = Path.home() / "Library" / "Application Support"
+    else:
+        base = Path(os.environ.get("XDG_CONFIG_HOME") or (Path.home() / ".config"))
+    return base / "llmbench" / "config.json"
+
+
+def _config() -> Dict[str, Any]:
+    path = _config_path()
+    if not path.exists():
+        return {}
+    data = _load(str(path), "llmbench config")
+    if not isinstance(data, dict):
+        raise CliError("llmbench config must be a JSON object: %s" % path)
+    return data
+
+
+def cmd_config(args: argparse.Namespace) -> int:
+    path = _config_path()
+    config = _config()
+    if args.config_command == "show":
+        print("Config: %s" % path)
+        print(json.dumps(config or {"download_dir": "(not set; default: ./models)"}, indent=2))
+        return 0
+    if args.key != "download-dir":
+        raise CliError("unknown setting %r (available: download-dir)" % args.key)
+    folder = Path(args.value).expanduser().resolve()
+    try:
+        folder.mkdir(parents=True, exist_ok=True)
+        probe = folder / (".llmbench-write-test-%d" % os.getpid())
+        probe.write_bytes(b"")
+        probe.unlink()
+        path.parent.mkdir(parents=True, exist_ok=True)
+        config["download_dir"] = str(folder)
+        write_json(path, config)
+    except OSError as exc:
+        raise CliError("cannot use %s: %s" % (folder, exc.strerror or exc)) from None
+    print("Model download directory set to: %s" % folder)
+    print("Config saved at: %s" % path)
+    return 0
+
+
+def cmd_setup(args: argparse.Namespace) -> int:
+    """Check dependencies and print targeted setup steps; never installs silently."""
+    checks = [
+        ("Python 3.9+", sys.version_info >= (3, 9), sys.executable),
+        ("uv", shutil.which("uv") is not None, "brew install uv" if sys.platform == "darwin" else "https://docs.astral.sh/uv/getting-started/installation/"),
+        ("Homebrew", shutil.which("brew") is not None, "https://brew.sh/" if sys.platform == "darwin" else "macOS only"),
+        ("Strata", shutil.which("strata") is not None, "https://github.com/Niko1221/Strata/releases"),
+        ("LM Studio CLI (lms)", shutil.which("lms") is not None, "Install/open LM Studio, then enable its CLI in the app"),
+        ("Hugging Face downloader", shutil.which("hf") is not None, "uv tool install --force --with huggingface_hub git+https://github.com/LucianoAdonis/local-llm-benchmarks.git"),
+    ]
+    print("llmbench setup: dependency and runtime check\n")
+    for label, found, action in checks:
+        print("%-27s %s" % (label, "ready" if found else "not found"))
+        if not found:
+            print("  Next: %s" % action)
+    print("\nOptional macOS installs:")
+    print("  Strata: curl -fsSL --connect-timeout 15 --max-time 120 https://github.com/Niko1221/Strata/releases/latest/download/install.sh -o install.sh && sh install.sh; then `strata launch`.")
+    print("  llama.cpp: brew install llama.cpp")
+    print("  LM Studio/Bionic: https://lmstudio.ai/download ; choose its model folder in My Models.")
+    print("\nModel files stay where you choose. Set the default destination with:")
+    print("  llmbench config set download-dir /Volumes/ModelSSD/llm-models")
+    print("Review model licences, free disk space and download size before pulling. Strata's managed packs should be installed through `strata launch`.")
+    return 0 if sys.version_info >= (3, 9) else 1
+
+
+def cmd_models(args: argparse.Namespace) -> int:
+    if args.models_command == "list":
+        print("Starter GGUF catalog (Hugging Face download snapshot: 2026-11-25; counts are popularity signals, not quality scores):")
+        for model in MODELS:
+            print("\n%-22s %s" % (model["id"], model["name"]))
+            print("  Tier: %s | Parameters: %s | Download: %s | Hub downloads: %s (snapshot)" % (model["tier"], model["params"], model["size"], format(model["downloads"], ",")))
+            print("  %s" % model["note"])
+            print("  %s" % model["url"])
+        print("\nPull an entry with `llmbench models pull ID`; choose a custom destination with --dir.")
+        return 0
+    try:
+        model = find_model(args.model_id)
+    except KeyError:
+        raise CliError("unknown model id %r; run `llmbench models list`" % args.model_id) from None
+    try:
+        from huggingface_hub import snapshot_download
+    except ImportError:
+        raise CliError("model downloads need the optional Hugging Face client. Install it with `uv tool install --force --with huggingface_hub git+https://github.com/LucianoAdonis/local-llm-benchmarks.git` and reopen the terminal.") from None
+    config = _config()
+    folder = Path(args.directory or config.get("download_dir") or "models").expanduser().resolve()
+    target = folder / model["id"]
+    try:
+        folder.mkdir(parents=True, exist_ok=True)
+        free_bytes = shutil.disk_usage(folder).free
+    except OSError as exc:
+        raise CliError("cannot access download directory %s: %s" % (folder, exc.strerror or exc)) from None
+    required_bytes = int(model["bytes"] * 1.10) + 2_000_000_000
+    print("Free space on destination: %.1f GB" % (free_bytes / 1_000_000_000))
+    if free_bytes < required_bytes:
+        raise CliError("not enough free disk space for %s: allow at least %.1f GB here (including download headroom); choose another path with --dir or config set download-dir" % (model["name"], required_bytes / 1_000_000_000))
+    print("Model: %s (%s)" % (model["name"], model["size"]))
+    print("Source: %s" % model["url"])
+    print("Destination: %s" % target)
+    print("Hugging Face downloads use resumable cache and only the listed checkpoint file(s).")
+    try:
+        snapshot_download(
+            repo_id=model["repo"],
+            allow_patterns=model["files"],
+            local_dir=str(target),
+        )
+    except Exception as exc:
+        raise CliError("download failed: %s" % clean(str(exc))) from None
+    print("\nDownload finished: %s" % target)
+    print("For LM Studio/Bionic, import the GGUF file using `lms import PATH` or the app's import flow.")
+    print("For Strata, use its guided model setup unless its current model catalog explicitly supports this GGUF.")
+    return 0
+
+
+def cmd_export(args: argparse.Namespace) -> int:
+    result = _load_result(args.result)
+    formats = {
+        "json": (".json", json.dumps(result, indent=2, ensure_ascii=False) + "\n"),
+        "markdown": (".md", report.markdown(result)),
+        "csv": (".csv", report.csv(result)),
+    }
+    suffix, contents = formats[args.format]
+    output = Path(args.output) if args.output else Path(args.result).with_suffix(suffix)
+    try:
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text(contents, encoding="utf-8")
+    except OSError as exc:
+        raise CliError("could not write %s: %s" % (output, exc.strerror or exc)) from None
+    print("Exported %s" % output)
+    if args.format == "json":
+        print("Before sharing, review it and run `llmbench sanitize` if you want paths and local identifiers redacted.")
+    return 0
+
+
 def cmd_compare(args: argparse.Namespace) -> int:
     text = report.compare(_load_result(args.base), _load_result(args.new))
     print(text)
@@ -373,6 +512,27 @@ def build_parser() -> argparse.ArgumentParser:
     pull.add_argument("--model", required=True, help="model name, optionally with quantization, e.g. llama-3.1-8b@q4_k_m")
     pull.set_defaults(func=cmd_pull)
 
+    setup = sub.add_parser("setup", help="check setup prerequisites and show install steps for macOS/Windows/Linux")
+    setup.set_defaults(func=cmd_setup)
+
+    config = sub.add_parser("config", help="view or change llmbench preferences")
+    config_sub = config.add_subparsers(dest="config_command", required=True)
+    config_show = config_sub.add_parser("show", help="show saved preferences")
+    config_show.set_defaults(func=cmd_config)
+    config_set = config_sub.add_parser("set", help="save a preference")
+    config_set.add_argument("key", help="currently: download-dir")
+    config_set.add_argument("value", help="path, for example /Volumes/ModelSSD/llm-models")
+    config_set.set_defaults(func=cmd_config)
+
+    models = sub.add_parser("models", help="browse and download the curated GGUF starter models")
+    models_sub = models.add_subparsers(dest="models_command", required=True)
+    models_list = models_sub.add_parser("list", help="list small, midrange and large/offload model choices")
+    models_list.set_defaults(func=cmd_models)
+    model_pull = models_sub.add_parser("pull", help="download one catalog model from Hugging Face")
+    model_pull.add_argument("model_id", help="id shown by `llmbench models list`")
+    model_pull.add_argument("--dir", dest="directory", help="download directory (overrides saved download-dir)")
+    model_pull.set_defaults(func=cmd_models)
+
     run = sub.add_parser("run", help="run a benchmark suite and save a result file")
     run.add_argument("--url", help="server address, e.g. http://127.0.0.1:1234 (found automatically when only one runtime is running)")
     run.add_argument("--model", help="model id as the server lists it (chosen automatically when unambiguous)")
@@ -403,6 +563,12 @@ def build_parser() -> argparse.ArgumentParser:
     rep.add_argument("files", nargs="+")
     rep.add_argument("--markdown", action="store_true", help="Markdown for a README or an issue")
     rep.set_defaults(func=cmd_report)
+
+    export = sub.add_parser("export", help="write one benchmark result as Markdown, CSV, or JSON")
+    export.add_argument("result", help="saved llmbench result JSON")
+    export.add_argument("--format", choices=("markdown", "csv", "json"), default="markdown")
+    export.add_argument("--output", help="output path (default: same name with .md, .csv or .json)")
+    export.set_defaults(func=cmd_export)
 
     cmp_parser = sub.add_parser("compare", help="A/B two saved results with a noise-aware verdict")
     cmp_parser.add_argument("base")

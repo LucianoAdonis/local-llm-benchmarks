@@ -4,6 +4,25 @@
 
 Sizes below come from the files used in the November 23, 2026 benchmark unless marked as publisher-rounded. Local byte counts can vary with revisions and support files.
 
+## Starter catalog for `llmbench models`
+
+These entries are intended to make a first download straightforward. The picks use Hugging Face GGUF repos with strong download activity observed on 2026-11-25; popularity changes, so treat this as a dated snapshot rather than a current ranking. Quant names and sizes are shown to make storage needs concrete. Model fit depends on available VRAM/unified memory, context length, KV cache, and what else is running.
+
+| Catalog ID | Model and variant | Approximate download | Hugging Face repo downloads, 2026-11-25 snapshot | Intended use |
+|---|---|---:|---:|---|
+| `qwen9b-q4` | Qwen3.5 9B, Q4_K_M | 5.68 GB | 2.20M | First Mac/PC download; leaves more memory for context |
+| `qwen27b-q4` | Qwen3.5 27B, Q4_K_M | 16.74 GB | 406K | Higher capacity; needs enough fast memory for weights plus context |
+| `qwen35b-a3b-q4xl` | Qwen3.6 35B-A3B, UD-Q4_K_XL | 22.85 GB | 3.05M | Larger MoE model; 3B active per token does not mean only 3B of weights need memory |
+| `qwen177b-iq2xs` | Qwen3.8 Flash Next 177B, UD-IQ2_XS | 75.83 GB / 3 shards | 4.05M | Large offload experiment; not a sensible first download on a Mac with limited memory |
+
+Install the optional downloader with `uv tool install --force --with huggingface_hub ...`, pick a destination using `llmbench config set download-dir PATH`, and review available entries with `llmbench models list`. A pull goes to a folder named after the catalog ID. These are GGUF artifacts, not Strata `.strata` packs; use Strata's guided installer for its managed model formats and required support files.
+
+The catalog can evolve. Before a release, recheck the model cards, exact files, sizes, licenses, and supported runtime versions. `qwen177b-iq2xs` is meant to exercise memory/offload behavior; SSD paging may make generation uncomfortably slow. The existing 763B DeepSeek V4.1 Flash 2.00 bpw measurement is documented below; the observed full package was 256.81 GB and exceeded the PC's 128 GB RAM, so it is an explicit storage/offload experiment, not an expected-fit model.
+
+### Beyond the PC baseline
+
+DeepSeek V4 Pro is a larger model family at roughly 1.6T parameters. A community GGUF lists an IQ1_M build around **346.6 GiB for weights alone**. That exceeds this PC's 128 GB of system RAM by a wide margin before context and runtime memory, and it is not a standard Strata managed pack. The 4 TB SSD could hold the files, but that does not make inference practical: loading and paging from SSD is far slower than RAM, and there is no validated run for this PC. So the curated pull list stops at 177B; the already-tested 763B DeepSeek Flash remains the largest model with evidence on this machine. [DeepSeek V4 Pro quantization files](https://huggingface.co/qtum/DeepSeek-V4-Pro-0813-GGUF)
+
 ## Tested models
 
 | Model | Total / active parameters | Tested artifact and quantization | Local download size | Context |

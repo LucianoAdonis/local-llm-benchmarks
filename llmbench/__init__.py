@@ -5,7 +5,7 @@ Windows, macOS and Linux against any OpenAI-compatible endpoint: Strata, LM Stud
 llama.cpp, Ollama, MLX-LM, vLLM.
 """
 
-__version__ = "0.1.1"
+__version__ = "0.2.0"
 
 # Bump PROTOCOL_VERSION when metric definitions change so old and new results are
 # never compared silently. Bump WORKLOAD_VERSION when generated prompt text changes.

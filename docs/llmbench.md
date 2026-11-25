@@ -10,7 +10,7 @@
 
 If the words below are new, read [start-here.md](start-here.md) first. The reasoning behind each design choice is in [benchmark-design.md](benchmark-design.md).
 
-For packaged installation and model downloads through the native runtime tools, see [model-setup.md](model-setup.md). `llmbench` never downloads large model files or changes a runtime configuration on its own.
+For packaged installation, first-run dependency checks, the starter model catalog, and model downloads, see [model-setup.md](model-setup.md). `llmbench setup` only checks and prints steps; `llmbench models pull` downloads only when explicitly requested. It does not alter runtime configuration.
 
 ## Quick start
 

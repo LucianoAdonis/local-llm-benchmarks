@@ -71,11 +71,11 @@ On Windows type `py` where these say `python3`. Per-runtime setup, the scenario 
 Python 3.9 or newer is required. Install the released command with `uv` on Windows, macOS, or Linux:
 
 ```sh
-uv tool install git+https://github.com/LucianoAdonis/local-llm-benchmarks.git@v0.1.1
+uv tool install --with huggingface_hub git+https://github.com/LucianoAdonis/local-llm-benchmarks.git@v0.2.0
 llmbench doctor
 ```
 
-`pipx` also works if you already use it: `pipx install git+https://github.com/LucianoAdonis/local-llm-benchmarks.git@v0.1.1`.
+`pipx` also works if you already use it for benchmarking only: `pipx install git+https://github.com/LucianoAdonis/local-llm-benchmarks.git@v0.2.0`. Model downloads need the optional Hugging Face client; the setup guide shows how to add it to an existing install.
 
 On macOS with Homebrew:
 
@@ -84,6 +84,8 @@ brew install --formula https://raw.githubusercontent.com/LucianoAdonis/local-llm
 ```
 
 The [GitHub release](https://github.com/LucianoAdonis/local-llm-benchmarks/releases) contains the wheel and source archive. `llmbench doctor` checks your computer and runtime; `llmbench pull --backend bionic --model MODEL@QUANT` explicitly delegates a model download to LM Studio. Strata pack downloads stay in Strata's guided setup. See [runtime and model setup](docs/model-setup.md).
+
+For a new Mac or another computer, `llmbench setup` checks prerequisites and shows install steps. `llmbench config set download-dir /path/to/models` saves a default model location, `llmbench models list` shows starter GGUFs, and `llmbench models pull ID` downloads a selected entry. The curated catalog ranges from 9B to a 177B offload experiment; review the listed disk and memory requirements before pulling. Export benchmark results with `llmbench export RESULT.json --format markdown|csv|json`.
 
 ## The 2026-11-23 baseline
 

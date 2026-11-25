@@ -2,6 +2,62 @@
 
 `llmbench` checks the machine and runtime, then measures a running model. It never downloads anything automatically or changes runtime settings. Model files can be tens or hundreds of gigabytes, so confirm the publisher, format, quantization, and disk space first. The explicit `llmbench pull` command delegates LM Studio/Bionic downloads to `lms get`; Strata manages its own model packs and engine support files.
 
+## Guided first setup
+
+After installing the package, run:
+
+```sh
+llmbench setup
+llmbench doctor
+llmbench models list
+```
+
+`setup` checks Python, `uv`, Homebrew, Strata, the LM Studio CLI (`lms`), and the Hugging Face downloader. It shows the relevant setup steps for anything missing and does not install apps or alter your runtime automatically.
+
+On a new Mac, the shortest path is:
+
+```sh
+brew install uv
+uv tool install --force --with huggingface_hub git+https://github.com/LucianoAdonis/local-llm-benchmarks.git
+llmbench setup
+```
+
+Install LM Studio from its official download page if you want Bionic/LM Studio, or install Strata using the official macOS instructions below. Open LM Studio once and enable its `lms` command if you want to use the app's model library. For llama.cpp, `brew install llama.cpp` is optional. The benchmark tool itself has no required Python packages; `huggingface_hub` is only for catalog downloads.
+
+### Choose and store a starter model
+
+The catalog has small, workstation, and large/offload tiers. Set a destination on a roomy internal or external SSD once:
+
+```sh
+llmbench config set download-dir /Volumes/ModelSSD/llm-models
+llmbench config show
+```
+
+On a Mac without an external drive, choose a folder with enough free space, such as `~/Models/llmbench`. Then pull the model you selected:
+
+```sh
+llmbench models list
+llmbench models pull qwen9b-q4
+# or, for a bigger machine:
+llmbench models pull qwen27b-q4
+```
+
+Override the saved destination for one download with `--dir /path/to/folder`. Catalog downloads use Hugging Face's resumable client. The downloaded GGUF can be imported into LM Studio with its model import flow or `lms import /path/to/file.gguf`. Check the source model card and license first. A catalog GGUF is not automatically a Strata pack; use `strata launch` for Strata-managed formats and support files.
+
+The 177B MoE entry is an intentional large-model experiment, not a recommended first Mac download. Its total weight footprint and context cache need to fit the host's available memory; if macOS starts swapping, expect a substantial slowdown. A fast SSD can help model loading and experiments but cannot make disk paging behave like unified memory.
+
+### Export a result
+
+Every benchmark result is saved as JSON by default. Export a shareable Markdown summary or spreadsheet-friendly CSV alongside it:
+
+```sh
+llmbench export local-results/run.json --format markdown
+llmbench export local-results/run.json --format csv
+llmbench export local-results/run.json --format json --output share/run-copy.json
+```
+
+Markdown and CSV contain summaries. JSON keeps the detailed result data; review it before sharing, and use `llmbench sanitize SOURCE DESTINATION` if you want the built-in path/address redaction applied. Always inspect exported files for private details.
+
 ## Strata
 
 Use Strata's official installer, then follow its guided model setup. The installer selects the right engine for your system; `strata launch` guides model, context, storage, and serving choices.

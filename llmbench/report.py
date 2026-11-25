@@ -1,6 +1,8 @@
 """Human-readable output: terminal table, Markdown summary, and A/B comparison."""
 from __future__ import annotations
 
+import csv as csv_module
+import io
 from typing import Any, Dict, List, Optional
 
 from . import PROTOCOL_VERSION
@@ -219,6 +221,24 @@ def markdown(result: Dict[str, Any]) -> str:
     for item in (verdict.get("problems") or []) + (verdict.get("cautions") or []):
         lines.append("- %s" % item)
     return "\n".join(lines) + "\n"
+
+
+def csv(result: Dict[str, Any]) -> str:
+    """Export one row per scenario, keeping machine-readable run medians."""
+    buffer = io.StringIO(newline="")
+    writer = csv_module.writer(buffer)
+    writer.writerow(("model", "runtime", "suite", "scenario", "prompt_tokens", "first_token_s", "read_tok_s", "write_tok_s", "runs_valid", "runs_total", "verdict"))
+    runtime = result.get("runtime") or {}
+    model = result.get("model") or {}
+    for record in result.get("scenarios") or []:
+        summary = record.get("summary") or {}
+        writer.writerow((
+            model.get("id"), runtime.get("name"), result.get("suite"), record.get("id"),
+            _median(record, "prompt_tokens"), _median(record, "ttft_s"), _median(record, "prefill_tok_s"),
+            _median(record, "decode_tok_s"), summary.get("runs_valid"), summary.get("runs_total"),
+            (result.get("verdict") or {}).get("status"),
+        ))
+    return buffer.getvalue()
 
 
 def compare(base: Dict[str, Any], new: Dict[str, Any]) -> str:
