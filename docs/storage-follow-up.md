@@ -56,3 +56,5 @@ Use varied text for this test. With a repetitive prompt the model keeps touching
 See [reporting a storage benchmark](storage-reporting.md) and [runtime compatibility and model retirement](model-retirement.md).
 
 The T500 is now installed as E:. D: is a separate hard drive. See the [November 26 DeepSeek comparison](../results/2026-11-26-storage/README.md). For replication, use the actual SSD drive letter in the procedure above.
+
+For an explanation of lane count, link speed, and slot placement, see [What PCIe ×4 means for an SSD](pcie-x4.md).
