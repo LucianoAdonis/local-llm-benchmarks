@@ -32,15 +32,15 @@ There is no defensible fixed percentage improvement to promise. The pre-registra
 ## A/B procedure after installing the T500
 
 1. Save the current `C:` results as the baseline; record both drive models, motherboard slot, firmware, free space, and temperatures.
-2. Install the T500 in `M2D_SB`, confirm Windows sees the drive, format it, assign `D:`, and verify it operates at PCIe 4.0 x4. Do not move or delete the only copy of the model pack during setup.
-3. Copy the same model package to `D:` and verify file count, sizes, and hashes. Keep Strata/engine version, profile, quantization, context, prompts, output limit, and GPU/background state fixed.
+2. Install the T500 in `M2D_SB`, confirm Windows sees the drive, check or prepare its NTFS volume, identify its assigned drive letter (here `E:`), and verify it operates at PCIe 4.0 x4. Do not move or delete the only copy of the model pack during setup.
+3. Copy the same model package to `E:` and verify file count, sizes, and hashes. Keep Strata/engine version, profile, quantization, context, prompts, output limit, and GPU/background state fixed.
 4. Run separate tests for:
    - model cold-start/load time;
    - a cold 4K prompt and a cold long prompt;
    - warm 4K and long-prompt runs after the same profile is already loaded;
    - long-context decode with the same DeepSeek model and output budget.
 5. Record medians and ranges for prefill, decode, TTFC, wall time, peak RAM/VRAM, disk read MB/s, disk active time, and SSD temperature. Run at least three repeats for short tests; label a costly 256K run as one observation unless repeated.
-6. Compare `C:` and `D:` only after confirming the model source and all required shared files are on the intended drive. A drive letter alone does not prove which physical disk supplied the data.
+6. Compare `C:` and `E:` only after confirming the model source and all required shared files are on the intended drive. A drive letter alone does not prove which physical disk supplied the data.
 
 The warm/cold distinction matters: Windows file cache can make a second run look faster even when the SSD did not change. Rebooting or clearing caches changes the test condition; record which method was used and apply the same method to both drives.
 
@@ -52,3 +52,7 @@ Use varied text for this test. With a repetitive prompt the model keeps touching
 - [Gigabyte board manual and block diagram](https://download.gigabyte.com/FileList/Manual/mb_manual_x870e-aorus-pro-ice_1003_e.pdf)
 - [Kingston FURY Renegade G5 specs](https://www.kingston.com/en/ssd/gaming/kingston-fury-renegade-g5-nvme-m2-ssd?partnum=sfyr2s%2F2t0)
 - [Crucial T500 product flyer](https://uk.crucial.com/content/dam/crucial/ssd-products/t500/flyers/b2c/crucial-T500-b2c-product-flyer-en_combination.pdf)
+
+See [reporting a storage benchmark](storage-reporting.md) and [runtime compatibility and model retirement](model-retirement.md).
+
+The T500 is now installed as E:. D: is a separate hard drive. See the [November 26 DeepSeek comparison](../results/2026-11-26-storage/README.md). For replication, use the actual SSD drive letter in the procedure above.

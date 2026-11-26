@@ -111,3 +111,5 @@ llmbench run --suite quick --context 16384 --label "runtime version, model quant
 ```
 
 `doctor` reports the local machine and reachable runtimes. The benchmark records the model/runtime details the server exposes and validates that the requested prompt fits the configured context. Results go to `local-results/`; compare a later iteration with `llmbench compare BEFORE.json AFTER.json`.
+
+See [what happens when a runtime retires a model](model-retirement.md).

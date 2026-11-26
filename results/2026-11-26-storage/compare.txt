@@ -1,0 +1,19 @@
+A: DeepSeek Kingston C drive | Strata Strata ds4-0.1 | deepseek-v4.1-flash | suite quick
+B: DeepSeek T500 E drive | Strata Strata ds4-0.1 | deepseek-v4.1-flash | suite quick
+note: result A is 'usable with cautions'
+note: result B is 'usable with cautions'
+
+Scenario         Metric      A      B  Change  Counts above    Runs  Verdict
+--------  -------------  -----  -----  ------  ------------  ------  ------------
+ctx-4k    first token s   9.10  10.17  +11.7%         32.4%  3 vs 3  within noise
+ctx-4k       read tok/s    373    334  -10.5%         33.1%  3 vs 3  within noise
+ctx-4k      write tok/s  26.73  26.67   -0.2%         19.5%  3 vs 3  within noise
+ctx-16k   first token s  13.89  11.19  -19.4%         14.1%  3 vs 3  better
+ctx-16k      read tok/s  1,038  1,288  +24.1%         10.2%  3 vs 3  better
+ctx-16k     write tok/s  28.20  29.22   +3.6%         10.6%  3 vs 3  within noise
+
+In short (B against A): first token s: better in 1 of 2 scenarios; read tok/s: better in 1 of 2 scenarios; write tok/s: no change that counts in 2 scenarios.
+
+A change counts only above the 'Counts above' column: the gap that run-to-run variation alone would
+produce less than about one time in twenty, and never under 2%. With two or three runs that bar is
+high. To resolve small differences, repeat both results with --runs 6 or more.

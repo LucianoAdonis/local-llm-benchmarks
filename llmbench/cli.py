@@ -394,7 +394,7 @@ def cmd_export(args: argparse.Namespace) -> int:
     output = Path(args.output) if args.output else Path(args.result).with_suffix(suffix)
     try:
         output.parent.mkdir(parents=True, exist_ok=True)
-        output.write_text(contents, encoding="utf-8")
+        output.write_bytes(contents.encode("utf-8"))
     except OSError as exc:
         raise CliError("could not write %s: %s" % (output, exc.strerror or exc)) from None
     print("Exported %s" % output)

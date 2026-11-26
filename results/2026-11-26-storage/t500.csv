@@ -1,0 +1,3 @@
+model,runtime,suite,scenario,prompt_tokens,first_token_s,read_tok_s,write_tok_s,runs_valid,runs_total,verdict
+deepseek-v4.1-flash,strata,quick,ctx-4k,3439.0,10.1723,333.99,26.6741,3,3,usable with cautions
+deepseek-v4.1-flash,strata,quick,ctx-16k,14533.0,11.1945,1288.41,29.2212,3,3,usable with cautions
