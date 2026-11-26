@@ -440,6 +440,18 @@ def cmd_sysinfo(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_diagnose(args: argparse.Namespace) -> int:
+    from . import diagnostics
+
+    results = [_load_result(path) for path in _expand(args.results)]
+    diagnostic = diagnostics.build(sysinfo.capture_system(), sysinfo.capture_state(), results)
+    if args.output:
+        write_json(Path(args.output), diagnostic)
+    else:
+        print(json.dumps(diagnostic, indent=2))
+    return 0
+
+
 def _expand(patterns: List[str]) -> List[str]:
     """Expand wildcards here, because Windows shells pass them through unexpanded."""
     paths: List[str] = []
@@ -597,6 +609,11 @@ def build_parser() -> argparse.ArgumentParser:
 
     info = sub.add_parser("sysinfo", help="print the system information that would be stored with a result")
     info.set_defaults(func=cmd_sysinfo)
+
+    diagnostic = sub.add_parser("diagnose", help="produce a machine and benchmark diagnostic as JSON")
+    diagnostic.add_argument("results", nargs="*", help="optional saved benchmark JSON reports")
+    diagnostic.add_argument("--output", help="write JSON to this path instead of stdout")
+    diagnostic.set_defaults(func=cmd_diagnose)
 
     san = sub.add_parser("sanitize", help="redact paths, local addresses and secrets from a JSON file")
     san.add_argument("paths", nargs="+", metavar="FILE", help="SOURCE DESTINATION, or with --check any number of files")

@@ -207,3 +207,5 @@ This is the command behind the Inkling SQ-10 128K row (400 sections, 64,513 toke
 ## License and attribution
 
 Original documentation and scripts are released under the MIT License. This does not license, redistribute, or change the terms of any model weights, Strata, llama.cpp, or other upstream software. See [LICENSE](LICENSE).
+
+For a reusable machine snapshot and guided follow-up measurements, see [Machine and benchmark diagnostics](docs/diagnostics.md).
