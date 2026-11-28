@@ -1,0 +1,640 @@
+{
+  "schema": "llmbench-result/2",
+  "tool": {
+    "name": "llmbench",
+    "version": "0.2.0",
+    "protocol": "2.0",
+    "workload": "2.0"
+  },
+  "created_utc": "2026-11-28T15:33:44+00:00",
+  "duration_s": 20.7,
+  "label": "strata-schema-parallel-thinking-off",
+  "suite": "quick",
+  "aborted": false,
+  "system": {
+    "platform": "Windows",
+    "arch": "AMD64",
+    "python": "3.14.7",
+    "cpu": "AMD Ryzen 9 9950X3D 16-Core Processor",
+    "cpu_cores": 16,
+    "cpu_threads": 32,
+    "os": "Microsoft Windows 11 Pro (build 26300)",
+    "ram_gb": 127.6,
+    "ram_modules": 4,
+    "ram_speed_mhz": 5200,
+    "gpus": [
+      {
+        "name": "NVIDIA GeForce RTX 5090",
+        "driver": "621.01",
+        "vram_gb": 31.8
+      }
+    ],
+    "disks": [
+      {
+        "name": "CT4000T500SSD3",
+        "media": "SSD",
+        "bus": "NVMe",
+        "size_gb": 4001
+      },
+      {
+        "name": "KINGSTON SFYR2S2T0",
+        "media": "SSD",
+        "bus": "NVMe",
+        "size_gb": 2048
+      },
+      {
+        "name": "ST8000DM004-2U9188",
+        "media": "HDD",
+        "bus": "SATA",
+        "size_gb": 8002
+      }
+    ]
+  },
+  "state_before": {
+    "power_plan": "Balanced",
+    "gpu_shared_memory_mb": 239,
+    "gpu": {
+      "vram_used_mb": 30899.0,
+      "vram_total_mb": 32607.0,
+      "temperature_c": 55.59,
+      "power_w": 61.68,
+      "power_limit_w": 575.0,
+      "utilization_pct": 3.0
+    },
+    "gpu_compute_processes": 35
+  },
+  "state_after": {
+    "power_plan": "Balanced",
+    "gpu_shared_memory_mb": 239,
+    "gpu": {
+      "vram_used_mb": 30842.0,
+      "vram_total_mb": 32607.0,
+      "temperature_c": 60.2,
+      "power_w": 275.92,
+      "power_limit_w": 575.0,
+      "utilization_pct": 2.0
+    },
+    "gpu_compute_processes": 35
+  },
+  "preflight_warnings": [],
+  "runtime": {
+    "name": "strata",
+    "version": "Strata 0.1.67",
+    "context_tokens": 32768,
+    "slots": 1,
+    "model_file": "Qwen3.6-35B-A3B-UD-Q4_K_XL.gguf",
+    "server_props": {
+      "total_slots": 1,
+      "model_alias": "qwen3.6-35b-a3b-ud-q4_k_xl",
+      "build_info": "Strata 0.1.67",
+      "health.status": "ok",
+      "health.max_context": 32768,
+      "health.loaded": true,
+      "health.service": "strata"
+    },
+    "model_details": null,
+    "loaded_models": [
+      "qwen3.6-35b-a3b-ud-q4_k_xl"
+    ]
+  },
+  "model": {
+    "id": "qwen3.6-35b-a3b-ud-q4_k_xl",
+    "details": null
+  },
+  "settings": {
+    "temperature": 0,
+    "context_tokens": 32768,
+    "context_source": "argument",
+    "corpus": "diverse",
+    "seed": "llmbench",
+    "text_salt": "72fac47c",
+    "scenario_ids": [
+      "schema",
+      "parallel-4"
+    ],
+    "custom_selection": true,
+    "extra_body": {
+      "reasoning_effort": "none",
+      "chat_template_kwargs": {
+        "enable_thinking": false
+      }
+    },
+    "endpoint": "loopback:8080",
+    "declared_cold_start": false,
+    "thinking": "off",
+    "size_warmup": true,
+    "engine_log_used": false
+  },
+  "warmup": {
+    "ttft_s": 0.0626207,
+    "wall_s": 0.184312,
+    "prompt_tokens": 120,
+    "completion_tokens": 32,
+    "flags": []
+  },
+  "calibration": {
+    "diverse": {
+      "corpus": "diverse",
+      "source": "probe",
+      "chars_per_token": 3.60529,
+      "overhead_tokens": 2.55607,
+      "probe_tokens": 3478,
+      "rough_prefill_tok_s": 13637.4,
+      "template_cached_tokens": 0
+    }
+  },
+  "scenarios": [
+    {
+      "id": "schema",
+      "kind": "schema",
+      "max_tokens": 2048,
+      "runs": [
+        {
+          "error": null,
+          "flags": [],
+          "prompt_tokens": 666,
+          "prompt_tokens_source": "usage",
+          "completion_tokens": 558,
+          "completion_tokens_source": "usage",
+          "cached_tokens": 0,
+          "cached_tokens_source": "usage",
+          "fresh_prompt_tokens": 666,
+          "finish_reason": "stop",
+          "ttft_s": 1.61757,
+          "ttfa_s": 1.61757,
+          "decode_window_s": 0.0,
+          "wall_s": 1.61768,
+          "connect_s": 0.020063,
+          "reasoning_seen": false,
+          "answer_seen": true,
+          "inline_think": false,
+          "text_events": 1,
+          "bursts": 1,
+          "stream_granularity": 0.002,
+          "stream_reading": null,
+          "hidden_tokens": 0,
+          "hidden_tokens_source": null,
+          "output_chars": 2194,
+          "gap_median_ms": null,
+          "gap_p95_ms": null,
+          "gap_max_ms": null,
+          "client_decode_tok_s": null,
+          "client_prefill_tok_s": null,
+          "engine_decode_tok_s": 367.904,
+          "engine_prefill_tok_s": 6988.46,
+          "engine": {
+            "source": "timings",
+            "prompt_n": 666,
+            "prompt_ms": 95.3,
+            "prefill_tok_s": 6988.46,
+            "predicted_n": 558,
+            "predicted_ms": 1516.7,
+            "decode_tok_s": 367.904,
+            "decode_convention": "all-tokens",
+            "cache_n": 0,
+            "draft_n": 372,
+            "draft_n_accepted": 372
+          },
+          "decode_tok_s": 367.904,
+          "decode_source": "engine",
+          "prefill_tok_s": 6988.46,
+          "prefill_source": "engine",
+          "at_s": 3.107,
+          "nonce": "dd385347-72fac47c-schema-0",
+          "schema": {
+            "first_try": "violates",
+            "final": "violates",
+            "attempts": 3,
+            "problems": [
+              "$.items[0].description is 266 characters, the form allows 80",
+              "$.items[1].description is 328 characters, the form allows 80",
+              "$.items[2].description is 331 characters, the form allows 80",
+              "$.items[0].description is 171 characters, the form allows 80",
+              "$.items[1].description is 191 characters, the form allows 80"
+            ]
+          }
+        },
+        {
+          "error": null,
+          "flags": [],
+          "prompt_tokens": 651,
+          "prompt_tokens_source": "usage",
+          "completion_tokens": 544,
+          "completion_tokens_source": "usage",
+          "cached_tokens": 0,
+          "cached_tokens_source": "usage",
+          "fresh_prompt_tokens": 651,
+          "finish_reason": "stop",
+          "ttft_s": 1.57195,
+          "ttfa_s": 1.57195,
+          "decode_window_s": 0.0,
+          "wall_s": 1.57199,
+          "connect_s": 0.0205746,
+          "reasoning_seen": false,
+          "answer_seen": true,
+          "inline_think": false,
+          "text_events": 1,
+          "bursts": 1,
+          "stream_granularity": 0.002,
+          "stream_reading": null,
+          "hidden_tokens": 0,
+          "hidden_tokens_source": null,
+          "output_chars": 1952,
+          "gap_median_ms": null,
+          "gap_p95_ms": null,
+          "gap_max_ms": null,
+          "client_decode_tok_s": null,
+          "client_prefill_tok_s": null,
+          "engine_decode_tok_s": 369.641,
+          "engine_prefill_tok_s": 6888.89,
+          "engine": {
+            "source": "timings",
+            "prompt_n": 651,
+            "prompt_ms": 94.5,
+            "prefill_tok_s": 6888.89,
+            "predicted_n": 544,
+            "predicted_ms": 1471.7,
+            "decode_tok_s": 369.641,
+            "decode_convention": "all-tokens",
+            "cache_n": 0,
+            "draft_n": 362,
+            "draft_n_accepted": 362
+          },
+          "decode_tok_s": 369.641,
+          "decode_source": "engine",
+          "prefill_tok_s": 6888.89,
+          "prefill_source": "engine",
+          "at_s": 6.965,
+          "nonce": "a53ba36f-72fac47c-schema-1",
+          "schema": {
+            "first_try": "violates",
+            "final": "violates",
+            "attempts": 3,
+            "problems": [
+              "$.items[0].description is 252 characters, the form allows 80",
+              "$.items[1].description is 315 characters, the form allows 80",
+              "$.items[2].description is 291 characters, the form allows 80",
+              "$.items[5].description is 97 characters, the form allows 80",
+              "$.items[5].description is 97 characters, the form allows 80"
+            ]
+          }
+        },
+        {
+          "error": null,
+          "flags": [],
+          "prompt_tokens": 641,
+          "prompt_tokens_source": "usage",
+          "completion_tokens": 532,
+          "completion_tokens_source": "usage",
+          "cached_tokens": 0,
+          "cached_tokens_source": "usage",
+          "fresh_prompt_tokens": 641,
+          "finish_reason": "stop",
+          "ttft_s": 1.54618,
+          "ttfa_s": 1.54618,
+          "decode_window_s": 0.0,
+          "wall_s": 1.54626,
+          "connect_s": 0.0173352,
+          "reasoning_seen": false,
+          "answer_seen": true,
+          "inline_think": false,
+          "text_events": 1,
+          "bursts": 1,
+          "stream_granularity": 0.002,
+          "stream_reading": null,
+          "hidden_tokens": 0,
+          "hidden_tokens_source": null,
+          "output_chars": 2088,
+          "gap_median_ms": null,
+          "gap_p95_ms": null,
+          "gap_max_ms": null,
+          "client_decode_tok_s": null,
+          "client_prefill_tok_s": null,
+          "engine_decode_tok_s": 368.217,
+          "engine_prefill_tok_s": 6698.01,
+          "engine": {
+            "source": "timings",
+            "prompt_n": 641,
+            "prompt_ms": 95.7,
+            "prefill_tok_s": 6698.01,
+            "predicted_n": 532,
+            "predicted_ms": 1444.8,
+            "decode_tok_s": 368.217,
+            "decode_convention": "all-tokens",
+            "cache_n": 0,
+            "draft_n": 354,
+            "draft_n_accepted": 354
+          },
+          "decode_tok_s": 368.217,
+          "decode_source": "engine",
+          "prefill_tok_s": 6698.01,
+          "prefill_source": "engine",
+          "at_s": 10.004,
+          "nonce": "a72030c9-72fac47c-schema-2",
+          "schema": {
+            "first_try": "violates",
+            "final": "fits",
+            "attempts": 3,
+            "problems": [
+              "$.items[0].description is 262 characters, the form allows 80",
+              "$.items[1].description is 271 characters, the form allows 80",
+              "$.items[2].description is 335 characters, the form allows 80",
+              "$.items[0].description is 125 characters, the form allows 80",
+              "$.items[1].description is 123 characters, the form allows 80"
+            ]
+          }
+        }
+      ],
+      "title": "Copy a catalogue into a fixed JSON form: does the server hold the model to the schema?",
+      "planned_runs": 3,
+      "gpu": {
+        "samples": 10,
+        "temperature_c": {
+          "min": 62.56,
+          "mean": 64.1,
+          "max": 65.86
+        },
+        "power_w": {
+          "min": 197.25,
+          "mean": 338.2,
+          "max": 362.09
+        },
+        "utilization_pct": {
+          "min": 71.0,
+          "mean": 92.5,
+          "max": 99.0
+        },
+        "vram_used_mb": {
+          "min": 30843.0,
+          "mean": 30843.0,
+          "max": 30843.0
+        }
+      },
+      "summary": {
+        "runs_total": 3,
+        "runs_valid": 3,
+        "prompt_tokens": {
+          "n": 3,
+          "median": 651.0,
+          "min": 641.0,
+          "max": 666.0,
+          "mean": 652.667,
+          "stdev": 12.5831,
+          "cv_pct": 1.92795,
+          "spread_pct": 1.92012
+        },
+        "fresh_prompt_tokens": {
+          "n": 3,
+          "median": 651.0,
+          "min": 641.0,
+          "max": 666.0,
+          "mean": 652.667,
+          "stdev": 12.5831,
+          "cv_pct": 1.92795,
+          "spread_pct": 1.92012
+        },
+        "completion_tokens": {
+          "n": 3,
+          "median": 544.0,
+          "min": 532.0,
+          "max": 558.0,
+          "mean": 544.667,
+          "stdev": 13.0128,
+          "cv_pct": 2.38913,
+          "spread_pct": 2.38971
+        },
+        "cached_tokens": {
+          "n": 3,
+          "median": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "mean": 0.0,
+          "stdev": 0.0,
+          "cv_pct": 0.0,
+          "spread_pct": 0.0
+        },
+        "ttft_s": {
+          "n": 3,
+          "median": 1.57195,
+          "min": 1.54618,
+          "max": 1.61757,
+          "mean": 1.57856,
+          "stdev": 0.036152,
+          "cv_pct": 2.29019,
+          "spread_pct": 2.27075
+        },
+        "ttfa_s": {
+          "n": 3,
+          "median": 1.57195,
+          "min": 1.54618,
+          "max": 1.61757,
+          "mean": 1.57856,
+          "stdev": 0.036152,
+          "cv_pct": 2.29019,
+          "spread_pct": 2.27075
+        },
+        "wall_s": {
+          "n": 3,
+          "median": 1.57199,
+          "min": 1.54626,
+          "max": 1.61768,
+          "mean": 1.57864,
+          "stdev": 0.0361692,
+          "cv_pct": 2.29116,
+          "spread_pct": 2.2715
+        },
+        "prefill_tok_s": {
+          "n": 3,
+          "median": 6888.89,
+          "min": 6698.01,
+          "max": 6988.46,
+          "mean": 6858.45,
+          "stdev": 147.594,
+          "cv_pct": 2.152,
+          "spread_pct": 2.10805
+        },
+        "decode_tok_s": {
+          "n": 3,
+          "median": 368.217,
+          "min": 367.904,
+          "max": 369.641,
+          "mean": 368.587,
+          "stdev": 0.925559,
+          "cv_pct": 0.25111,
+          "spread_pct": 0.235805
+        },
+        "engine_prefill_tok_s": {
+          "n": 3,
+          "median": 6888.89,
+          "min": 6698.01,
+          "max": 6988.46,
+          "mean": 6858.45,
+          "stdev": 147.594,
+          "cv_pct": 2.152,
+          "spread_pct": 2.10805
+        },
+        "engine_decode_tok_s": {
+          "n": 3,
+          "median": 368.217,
+          "min": 367.904,
+          "max": 369.641,
+          "mean": 368.587,
+          "stdev": 0.925559,
+          "cv_pct": 0.25111,
+          "spread_pct": 0.235805
+        },
+        "flags": {},
+        "decode_source": "engine",
+        "prefill_source": "engine",
+        "schema": {
+          "requests": 3,
+          "first_try": {
+            "violates": 3
+          },
+          "fit_in_the_end": 1,
+          "retries": 6,
+          "held_to_form": false
+        }
+      }
+    },
+    {
+      "id": "parallel-4",
+      "kind": "parallel",
+      "max_tokens": 256,
+      "runs": [
+        {
+          "flags": [
+            "hidden-tokens"
+          ],
+          "error": null,
+          "parallel": 4,
+          "requests_ok": 4,
+          "completion_tokens": 1024,
+          "wall_s": 3.56743,
+          "ttft_s": 1.42342,
+          "ttft_worst_s": 2.74712,
+          "decode_tok_s": 287.042,
+          "decode_source": "aggregate",
+          "per_request_decode_tok_s": [
+            312.386,
+            301.07,
+            314.072,
+            299.555
+          ]
+        },
+        {
+          "flags": [
+            "hidden-tokens"
+          ],
+          "error": null,
+          "parallel": 4,
+          "requests_ok": 4,
+          "completion_tokens": 1024,
+          "wall_s": 3.58185,
+          "ttft_s": 1.36447,
+          "ttft_worst_s": 2.74405,
+          "decode_tok_s": 285.885,
+          "decode_source": "aggregate",
+          "per_request_decode_tok_s": [
+            308.359,
+            283.594,
+            319.441,
+            312.043
+          ]
+        }
+      ],
+      "title": "4 short requests at the same time",
+      "parallel": 4,
+      "planned_runs": 2,
+      "gpu": {
+        "samples": 8,
+        "temperature_c": {
+          "min": 64.55,
+          "mean": 64.8,
+          "max": 64.98
+        },
+        "power_w": {
+          "min": 350.31,
+          "mean": 353.7,
+          "max": 358.07
+        },
+        "utilization_pct": {
+          "min": 93.0,
+          "mean": 94.0,
+          "max": 95.0
+        },
+        "vram_used_mb": {
+          "min": 30842.0,
+          "mean": 30842.4,
+          "max": 30843.0
+        }
+      },
+      "summary": {
+        "runs_total": 2,
+        "runs_valid": 2,
+        "completion_tokens": {
+          "n": 2,
+          "median": 1024.0,
+          "min": 1024.0,
+          "max": 1024.0,
+          "mean": 1024.0,
+          "stdev": 0.0,
+          "cv_pct": 0.0,
+          "spread_pct": 0.0
+        },
+        "ttft_s": {
+          "n": 2,
+          "median": 1.39395,
+          "min": 1.36447,
+          "max": 1.42342,
+          "mean": 1.39395,
+          "stdev": 0.0416897,
+          "cv_pct": 2.99077,
+          "spread_pct": 2.11479
+        },
+        "wall_s": {
+          "n": 2,
+          "median": 3.57464,
+          "min": 3.56743,
+          "max": 3.58185,
+          "mean": 3.57464,
+          "stdev": 0.0102026,
+          "cv_pct": 0.285417,
+          "spread_pct": 0.20182
+        },
+        "decode_tok_s": {
+          "n": 2,
+          "median": 286.464,
+          "min": 285.885,
+          "max": 287.042,
+          "mean": 286.464,
+          "stdev": 0.817616,
+          "cv_pct": 0.285417,
+          "spread_pct": 0.20182
+        },
+        "flags": {
+          "hidden-tokens": 2
+        },
+        "decode_source": "aggregate",
+        "prefill_source": null,
+        "ttft_worst_s": 2.74712
+      }
+    }
+  ],
+  "notes": [],
+  "headline": {
+    "chat_first_token_s": null,
+    "writing_tok_s": null,
+    "writing_source": null,
+    "reading_tok_s": {},
+    "request_seconds": {}
+  },
+  "verdict": {
+    "status": "usable with cautions",
+    "problems": [],
+    "cautions": [
+      "schema: 3 of 3 first answers did not fit the JSON schema (violates 3); this server does not hold the model to the schema, so callers must validate and ask again (1 of 3 fit after up to 2 retries)",
+      "parallel-4: the server counted tokens that never appeared in the stream (often suppressed thinking); the wait for the first token includes writing them"
+    ]
+  }
+}

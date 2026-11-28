@@ -214,7 +214,7 @@ Strata's own `strata bench run` is worth running too. It is Strata's draft stand
 |---|---|---|---|
 | `quick` | short chat, 4K read, 16K read | 16,384 | under a minute to about 3 on a fast PC; about 8 on a base M4 Mac |
 | `standard` | adds a long answer, a cached follow-up, a 64K read, the sanity checks and the end-of-run control | 65,536 | 2 to 10 minutes on a fast PC; 35 minutes or more on a base M4 Mac |
-| `deep` | adds 32K, 128K and 256K reads, the repetitive-text probe and four parallel requests | 262,144 for all of it | much longer; the big reads dominate |
+| `deep` | adds 32K, 128K and 256K reads, the repetitive-text probe, four parallel requests and the JSON schema probe | 262,144 for all of it | much longer; the big reads dominate |
 
 The Mac times are arithmetic from one measured base M4 (230 tok/s reading, 20 writing): a 64K prompt takes four to six minutes per run there. Start with `quick`. The tool prints its own time estimate once it has seen your speeds.
 
@@ -226,6 +226,7 @@ The Mac times are arithmetic from one measured base M4 (230 tok/s reading, 20 wr
 | `followup-16k` | After that first read, how quick is the next question on the same material? |
 | `repeat-16k` | Does this runtime speed up on repetitive text? If so, benchmarks built on repeated prompts overstate it. |
 | `parallel-4` | What is the total output with four requests at once? |
+| `schema` | Asked for JSON in a fixed form, does the server hold the model to it (LM Studio, llama.cpp), or only check it afterwards and refuse or pass on a broken answer (Strata in November 2026)? Add it to any suite with `--scenarios schema`. |
 | `sanity` | Three exact-answer checks. Is the model actually receiving the whole prompt? |
 | `control` | The first scenario again at the end. Did the machine or runtime drift during the run? |
 | `soak` | Does speed hold for ten minutes, or does heat pull it down? Add with `--soak-minutes 10`. |
@@ -241,7 +242,7 @@ Useful options:
 | `--depths 4k,32k,128k` | Run these read sizes instead of the suite's. |
 | `--scenarios chat,ctx-16k` | Run only these. |
 | `--runs N` | More repeats for a tighter result. |
-| `--thinking off` | Ask the runtime to switch model thinking off. The result shows whether it did. |
+| `--thinking off` | Ask the runtime to switch model thinking off (`reasoning_effort: none` and `enable_thinking: false`). The result shows whether it did. Run with and without it before comparing runtimes: tok/s counts thinking, so a model that thinks can look fast and still take several times longer to answer. `compare` warns when one file thought and the other did not. |
 | `--soak-minutes 10` | Add the stability soak. |
 | `--corpus file:PATH` | Use your own code or text as the reading material. Only its size and a hash are stored. |
 | `--label "text"` | A note stored with the result: versions, settings, what you changed. |
@@ -397,7 +398,7 @@ What is recorded: operating system, CPU, GPU, memory size, GPU driver, power sou
 ## Limits
 
 - It measures speed. It does not rank answer quality. The sanity checks only confirm that the model is reading the prompt and answering.
-- One request at a time is the focus. `parallel-4` is a single optional probe, not a load test.
+- One request at a time is the focus. `parallel-4` is a single optional probe, not a load test. It still separates runtimes: on the reference PC LM Studio gave 1.7 times its single-request output at four requests and Strata none ([2026-11-28](../results/2026-11-28/README.md)).
 - Without engine timings the reading speed still includes a few milliseconds of request overhead, which matters for prompts under about 1,000 tokens.
 - It reads VRAM use and GPU temperature through `nvidia-smi` only. On AMD, Intel and Apple graphics it still measures speed, but it cannot warn about a full card.
 - It was developed on macOS and checked there against its own fake server. When this page was written it had not yet been run against a loaded model, and had not been run on Windows or Linux at all. Those systems use the same code, and a CI workflow that runs the tests on all three is included but has not run yet.

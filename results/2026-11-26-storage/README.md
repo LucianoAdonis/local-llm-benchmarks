@@ -13,4 +13,6 @@ Three measured runs per row plus warm-up. The T500's 16K prefill was 24.1% faste
 
 The Kingston preloaded 75.4 GB into the engine RAM store in 11.6 s. The T500 preloaded 75.9 GB in 16.0 s during this pass, and 73.2 GB in 22.1 s in an earlier exploratory run. These are preload stages, not total cold startup times. A Gen 5 SSD installed in M2D_SB would still negotiate Gen 4. This test provides no basis to replace the T500 solely to improve decode speed.
 
+A later test with a model that fits in VRAM (Qwen3.6-35B-A3B Q4_K_M, 22 GB, LM Studio, file cache cleared) loaded in 11.8 to 12.0 s from the Kingston and 13.6 to 14.0 s from the T500, and generated at 230 to 241 tok/s from either: once a model is in VRAM the drive does not matter. See [2026-11-28](../2026-11-28/README.md).
+
 [Kingston JSON](kingston.json) / [CSV](kingston.csv) · [T500 JSON](t500.json) / [CSV](t500.csv) · [Comparison](compare.txt) · [Reporting procedure](../../docs/storage-reporting.md)

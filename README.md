@@ -132,6 +132,16 @@ They remain a fair record of what was measured on that day. New measurements sho
 
 Using `llmbench` 0.1.0 on the same Ryzen 9 9950X3D / RTX 5090 PC and Strata 0.2.21.1 / engine 0.1.67, the 32K Inkling SQ-10 run measured **195 tok/s at 3.5K prompt tokens** and **168 tok/s at 14.5K**, with about **7.1K tok/s reading** at the larger depth. Qwen3.6 UD-Q4_K_XL measured **284 tok/s at 3.4K** and **215 tok/s at 14.6K**, with **9.6K tok/s reading** at the larger depth. Each scenario has three runs. Both results carry cautions: Strata reported hidden thinking tokens, and Qwen reached 97% VRAM use. These diverse-corpus quick runs are not direct comparisons to the older repeated-text baseline or Strata's native standard suite. See the [sanitized results and full run details](results/2026-11-25/README.md).
 
+**Correction (2026-11-28):** these runs had Qwen's thinking on, and every run produced only thinking within the output cap. The rates are real generated tokens, but they are not the speed at which answers appear, and they should not be set beside LM Studio or Bionic figures as an engine race. See the next section.
+
+## The 2026-11-28 correction: thinking, not the engine
+
+The same Qwen3.6 UD-Q4_K_XL file was served by Strata and by LM Studio, each with thinking on and off. With thinking off, Strata wrote 0 to 35% faster on one request (305 against 226 tok/s on a short chat, 194 against 197 at a 16K prompt). With four requests at once LM Studio delivered **383 tok/s** in total, 1.7 times its single rate, while Strata stayed at 286 (and fell to 234 with four slots). Only LM Studio held a JSON answer to its schema (3 of 3 first tries against 0 of 3). With thinking on, Qwen often never reached an answer: on a short JSON task it thought through a 2,048-token cap nine times out of nine on LM Studio.
+
+On a real JSON-extraction job on this PC, switching thinking off made the job **4.2 times faster** at similar accuracy, Strata on the same file was 15% slower than LM Studio, four parallel requests gave another 1.7 times, and neither a 16K context nor the IQ3_M quant helped. Model load took 11.8 s from the CPU-attached Kingston and 14.0 s from the chipset-attached T500, with identical generation speed once loaded. Details and files: [results/2026-11-28](results/2026-11-28/README.md).
+
+The earlier impression that "Strata is about twice as fast as LM Studio" came from comparing different model files, timing sources and thinking states. It does not hold.
+
 ## Models and files
 
 | Model | Parameters | Tested file/quant | Local download size |
@@ -190,7 +200,8 @@ This is the command behind the Inkling SQ-10 128K row (400 sections, 64,513 toke
 - Inkling UD-Q4_K_M was run with DSpark disabled due to a Strata GGUF + DSpark missing-tensor issue ([Strata issue #6762](https://github.com/Niko1221/Strata/issues/6762)).
 - The synthetic code-review input checks serving behavior, not code-review correctness.
 - An earlier 82.3 tok/s DeepSeek figure is superseded. It came from a token-accounting error: the script divided all 100 billed tokens by the time in which 33 of them were generated. The original explanation, stream buffering, is neither confirmed nor ruled out by the files ([details](docs/benchmark-design.md#what-the-files-show-row-by-row)). Use the engine-timed results.
-- `llmbench` has now been run on Windows against loaded Strata models, and its 153 unit tests pass locally on Windows. The macOS and Linux CI jobs pass; real-model runs on those systems remain follow-up work. If a number looks wrong, please open an issue.
+- Speed in tok/s counts thinking tokens. A model that thinks can show a high rate and still take several times longer to answer; compare runtimes with the same `--thinking` setting (`llmbench compare` now warns when they differ). The 2026-11-25 Qwen and Inkling runs had thinking on.
+- `llmbench` has now been run on Windows against loaded Strata and LM Studio models, and its 160 unit tests pass locally on Windows. The macOS and Linux CI jobs pass; real-model runs on those systems remain follow-up work. If a number looks wrong, please open an issue.
 
 ## Repository layout
 
@@ -200,6 +211,7 @@ This is the command behind the Inkling SQ-10 128K row (400 sections, 64,513 toke
 - `scripts/` — the v1 benchmark clients and engine-log parsers (kept for the record) and a results redactor.
 - `results/2026-11-23/` — sanitized metadata, summary, and per-run JSON from the v1 baseline.
 - `results/2026-11-25/` — sanitized Strata/Bionic engine runs and the first v2 `llmbench` run on the baseline PC.
+- `results/2026-11-28/`: Strata against LM Studio on one model file, thinking on and off, parallel requests and the JSON schema probe.
 - `Formula/` and `.github/workflows/release.yml` — Homebrew formula and tagged wheel/source release.
 - `docs/model-setup.md` — runtime installation and native model download steps.
 - `local-results/` — where `llmbench` saves by default. Ignored by Git.

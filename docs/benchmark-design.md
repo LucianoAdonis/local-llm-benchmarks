@@ -121,11 +121,12 @@ A depth class is named after the window it fills. `ctx-32k` sends about 29,260 t
 | `followup-16k` | the 16K read, then a second question on the same conversation, 3 pairs | time to first token of the second turn, tokens served from cache, speed-up | runtimes that do not reuse the prefix |
 | `repeat-16k` | the v1 repetitive text at 16K | ratio against `ctx-16k` | engines that are flattered by repeated content |
 | `parallel-4` | four short requests at once, 2 rounds | total tokens per second, worst first token | servers that queue instead of batching |
+| `schema` | a six-entry catalogue to copy into a JSON form whose descriptions allow 80 characters, 3 runs; asked again up to twice when the answer does not fit | answers that fit on the first try and after retries, server refusals (HTTP 502 `structured_output_failed`) | servers that only prompt with the schema instead of constraining decoding to it, and thinking that never reaches an answer |
 | `sanity` | three exact-answer checks: echo a word, return a small JSON, find two markers hidden near the start and end of a 4K prompt | passed out of three | a model that is not seeing the whole prompt |
 | `control` | the `chat` scenario again at the very end | writing speed against the start | drift from heat, background load or a runtime that changed state |
 | `soak` (opt-in) | a 4K read and 256-token answer in a loop for N minutes | worst loop ÷ best loop | thermal throttling |
 
-Suites: `quick` (chat, 4K, 16K), `standard` (adds the long answer, follow-up, 64K, sanity and control), `deep` (adds 32K, 128K, 256K, the repetition probe and parallel requests).
+Suites: `quick` (chat, 4K, 16K), `standard` (adds the long answer, follow-up, 64K, sanity and control), `deep` (adds 32K, 128K, 256K, the repetition probe, parallel requests and the schema probe).
 
 Two scenarios the tool cannot run for you, and how to do them by hand:
 
@@ -167,7 +168,7 @@ Flags are listed in [llmbench.md](llmbench.md#result-quality-and-flags).
 ### How the tool itself is checked
 
 - `python3 -m llmbench selftest` runs the client against the fake server in a separate process and fails if writing speed is off by more than 4% or the first token by more than 40 ms. On a quiet machine the errors were under 0.5% and about 1 ms.
-- 153 unit tests cover the workload hashes, every metric formula, the stream classifier (separate thinking fields, inline think tags, tags split across events), runtime detection, the engine-log parser, the redactor, model-pull delegation, and full suite runs. They pass locally on Windows Python 3.14; CI has also passed on Windows, macOS, and Linux with Python 3.9 and 3.13.
+- 160 unit tests cover the workload hashes, every metric formula, the schema probe against servers that enforce, ignore or refuse the schema, the stream classifier (separate thinking fields, inline think tags, tags split across events), runtime detection, the engine-log parser, the redactor, model-pull delegation, and full suite runs. They pass locally on Windows Python 3.14; CI has also passed on Windows, macOS, and Linux with Python 3.9 and 3.13.
 - The CLI has been benchmarked against loaded Strata Inkling and Qwen models on one Windows PC. The new diverse-corpus measurements are documented separately from the older repeated-text baseline.
 
 ### Known limits
