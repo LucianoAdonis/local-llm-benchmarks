@@ -251,6 +251,43 @@ class RunnerTest(unittest.TestCase):
             self.assertIn("reasoning-only", record["runs"][0]["flags"])
         self.assertIsNotNone(result["headline"]["writing_tok_s"])
 
+    def test_schema_probe_on_a_server_that_holds_the_model_to_the_schema(self):
+        result = self.bench(suite="quick", runs=2, only=["schema"]).run()
+        record = result["scenarios"][0]
+        self.assertEqual(record["summary"]["runs_valid"], 2)
+        shape = record["summary"]["schema"]
+        self.assertEqual((shape["first_try"], shape["fit_in_the_end"], shape["retries"], shape["held_to_form"]), ({"fits": 2}, 2, 0, True))
+        self.assertFalse(any("JSON schema" in c for c in result["verdict"]["cautions"]))
+        self.assertIn("2 of 2 fit the schema first time", report.rows(result)[1][-1])
+
+    def test_schema_probe_on_servers_that_only_check_afterwards(self):
+        for mode, first in (("ignore", "violates"), ("refuse", "refused")):
+            result = self.bench(suite="quick", runs=1, only=["schema"], extra_body={"mock": dict(FAST, schema=mode)}).run()
+            record = result["scenarios"][0]
+            run = record["runs"][0]
+            self.assertEqual((run["schema"]["first_try"], run["schema"]["final"], run["schema"]["attempts"]), (first, "fits", 2), mode)
+            self.assertEqual(record["summary"]["runs_valid"], 1, mode)  # a refusal is retried and timed, not a failed run
+            self.assertIs(record["summary"]["schema"]["held_to_form"], False)
+            self.assertTrue(any("does not hold the model to the schema" in c for c in result["verdict"]["cautions"]), mode)
+
+    def test_schema_probe_when_every_answer_is_refused(self):
+        result = self.bench(suite="quick", runs=1, only=["schema"], extra_body={"mock": dict(FAST, schema="refuse-always")}).run()
+        record = result["scenarios"][0]
+        self.assertEqual(record["runs"][0]["schema"], {"first_try": "refused", "final": "refused", "attempts": 3, "problems": record["runs"][0]["schema"]["problems"]})
+        self.assertEqual(record["summary"]["schema"]["fit_in_the_end"], 0)
+        self.assertNotEqual(result["verdict"]["status"], "invalid")  # the refusal is the finding, not a broken run
+        self.assertTrue(any("0 of 1 fit after up to 2 retries" in c for c in result["verdict"]["cautions"]))
+
+    def test_schema_probe_is_in_the_deep_suite_only(self):
+        self.assertIn("schema", [s["id"] for s in build_suite("deep")])
+        self.assertNotIn("schema", [s["id"] for s in build_suite("standard")])
+
+    def test_compare_warns_when_only_one_side_thought(self):
+        plain = self.bench(suite="quick", runs=1, only=["chat"]).run()
+        thinking = self.bench(suite="quick", runs=1, only=["chat"], extra_body={"mock": dict(FAST, reasoning_tokens=64)}).run()
+        self.assertIn("THINKING DIFFERS", report.compare(thinking, plain))
+        self.assertNotIn("THINKING DIFFERS", report.compare(plain, plain))
+
     def test_sanity_gate_catches_a_runtime_that_drops_the_start_of_the_prompt(self):
         truncating = dict(FAST, n_ctx=1500)
         result = self.bench(suite="quick", only=["sanity"], extra_body={"mock": truncating}).run()

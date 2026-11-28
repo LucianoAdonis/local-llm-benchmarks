@@ -795,5 +795,82 @@ def sanity_messages(check: str, nonce: str, seed: int, corpus_text: str = "") ->
     raise ValueError("unknown sanity check %r" % check)
 
 
+# The structured-output probe. A catalogue whose descriptions are longer than the form
+# allows: a server that constrains decoding to the schema cannot write an over-long one; a
+# server that only prompts with the schema (Strata did in November 2026) often copies it whole.
+SCHEMA_ITEMS = 6
+SCHEMA_DESCRIPTION_MAX = 80
+
+
+def schema_form() -> Dict[str, object]:
+    """The JSON schema every structured-output request asks for."""
+    item = {
+        "type": "object",
+        "properties": {
+            "name": {"type": "string", "maxLength": 60},
+            "price": {"type": "integer"},
+            "description": {"type": "string", "maxLength": SCHEMA_DESCRIPTION_MAX},
+        },
+        "required": ["name", "price", "description"],
+        "additionalProperties": False,
+    }
+    return {
+        "type": "object",
+        "properties": {"items": {"type": "array", "items": item}},
+        "required": ["items"],
+        "additionalProperties": False,
+    }
+
+
+def schema_messages(nonce: str, seed: int) -> List[Dict[str, str]]:
+    rng = Rng(seed)
+    lines = []
+    for index in range(SCHEMA_ITEMS):
+        name = "%s %s" % (rng.pick(ADJS).capitalize(), rng.pick(NOUNS))
+        description = _paragraph(rng, 3, 4)
+        while len(description) < 2 * SCHEMA_DESCRIPTION_MAX:
+            description += " " + _sentence(rng)
+        lines.append("%d. %s | %d | %s" % (index + 1, name, rng.between(10, 990) * 10, description))
+    user = (
+        "Catalogue %s. Below are %d entries, one per line, as number. name | price | description."
+        "\n\n%s\n\nReturn every entry with its name, its price as a whole number and its description "
+        "copied word for word."
+    ) % (nonce, SCHEMA_ITEMS, "\n".join(lines))
+    return [{"role": "system", "content": _system("You turn catalogues into JSON.", nonce)}, {"role": "user", "content": user}]
+
+
+def check_schema(value: object, schema: Dict[str, object], path: str = "$") -> List[str]:
+    """What in ``value`` breaks ``schema``: the small subset of JSON Schema the probe uses."""
+    problems: List[str] = []
+    kind = schema.get("type")
+    if kind == "object":
+        if not isinstance(value, dict):
+            return ["%s is not an object" % path]
+        properties = schema.get("properties") or {}
+        for key in schema.get("required") or ():
+            if key not in value:
+                problems.append("%s.%s is missing" % (path, key))
+        if schema.get("additionalProperties") is False:
+            problems += ["%s.%s is not in the form" % (path, key) for key in value if key not in properties]
+        for key, sub in properties.items():  # type: ignore[union-attr]
+            if key in value:
+                problems += check_schema(value[key], sub, "%s.%s" % (path, key))
+    elif kind == "array":
+        if not isinstance(value, list):
+            return ["%s is not a list" % path]
+        for index, item in enumerate(value):
+            problems += check_schema(item, schema.get("items") or {}, "%s[%d]" % (path, index))  # type: ignore[arg-type]
+    elif kind == "string":
+        if not isinstance(value, str):
+            return ["%s is not text" % path]
+        most = schema.get("maxLength")
+        if isinstance(most, int) and len(value) > most:
+            problems.append("%s is %d characters, the form allows %d" % (path, len(value), most))
+    elif kind == "integer":
+        if isinstance(value, bool) or not isinstance(value, int):
+            return ["%s is not a whole number" % path]
+    return problems
+
+
 def message_chars(messages: List[Dict[str, str]]) -> int:
     return sum(len(m.get("content") or "") for m in messages)

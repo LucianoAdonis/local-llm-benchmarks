@@ -9,6 +9,8 @@ ctx-<N>k      How long does it take to read a fresh context that fills an N-thou
 followup-<N>k After that first read, how quick is the next question on the same context (cache)?
 repeat-<N>k   Same size but repetitive text: does this runtime speed up on repeated content?
 parallel-<n>  What happens to total throughput with n requests at once?
+schema        Asked for JSON in a fixed form, does the server hold the model to it, or only
+              check the answer afterwards (and refuse it, or pass it on broken)?
 """
 from __future__ import annotations
 
@@ -26,7 +28,10 @@ from . import runtimes, sysinfo
 from .client import EndpointError, post_json, split_base_url, stream_chat
 from .metrics import MIN_PREFILL_TOKENS, derive_run, fit_reading, normalize_engine, request_time, run_is_valid, stability, summarize_runs
 from .sanitize import clean_text
-from .workload import SANITY_CHECKS, Corpus, chat_messages, context_messages, followup_messages, message_chars, sanity_messages, seed_from
+from .workload import (
+    SANITY_CHECKS, Corpus, chat_messages, check_schema, context_messages, followup_messages, message_chars, sanity_messages, schema_form,
+    schema_messages, seed_from,
+)
 
 # A depth class is named after the context window it fits. The prompt targets 90% of what
 # that window leaves after the answer, so prompt plus output plus the drift between two
@@ -54,6 +59,11 @@ SIZE_REJECTION = re.compile(
     r"too (long|large|many tokens)|n_ctx|token limit|prompt is too|input is too"
 )
 TIMED_OUT = re.compile(r"(?i)timed out|no answer within")
+# Strata answers HTTP 502 with error.code "structured_output_failed" when the model's answer
+# does not fit the requested schema: it prompts with the schema instead of constraining the
+# decoding to it. A caller should ask again, as for any answer that does not fit.
+FORMAT_REFUSAL = re.compile(r"structured_output_failed")
+SCHEMA_RETRIES = 2
 
 
 def depth_target(label: str, reserve: int = CONTEXT_OUTPUT_TOKENS) -> int:
@@ -97,6 +107,10 @@ def parallel_scenario(count: int, runs: int = 2) -> Dict[str, Any]:
     return scenario("parallel-%d" % count, "parallel", 256, runs, "%d short requests at the same time" % count, parallel=count)
 
 
+def schema_scenario(runs: int = 3) -> Dict[str, Any]:
+    return scenario("schema", "schema", 2048, runs, "Copy a catalogue into a fixed JSON form (is the schema enforced?)")
+
+
 def control_scenario() -> Dict[str, Any]:
     return scenario("control", "chat", 256, 2, "The first scenario again, at the end, to detect drift")
 
@@ -118,7 +132,7 @@ def build_suite(name: str) -> List[Dict[str, Any]]:
         return [
             chat_scenario(5), gen_scenario(3), ctx_scenario("4k"), ctx_scenario("16k"), followup_scenario("16k"),
             repeat_scenario("16k"), ctx_scenario("32k"), ctx_scenario("64k"), ctx_scenario("128k"), ctx_scenario("256k"),
-            parallel_scenario(4), sanity_scenario(), control_scenario(),
+            parallel_scenario(4), schema_scenario(), sanity_scenario(), control_scenario(),
         ]
     raise ValueError("unknown suite %r (choose quick, standard or deep)" % name)
 
@@ -162,6 +176,54 @@ def sanity_summary(runs: List[Dict[str, Any]]) -> Dict[str, Any]:
         "checks_errored": [r.get("check") for r in runs if r.get("passed") is None and r.get("error")],
         "checks_inconclusive": [r.get("check") for r in runs if r.get("passed") is None and not r.get("error")],
     }
+
+
+def schema_outcome(stream: Dict[str, Any], form: Dict[str, Any]) -> Tuple[str, List[str]]:
+    """fits, violates, not-json, no-answer (thinking used the cap), refused (the server's own
+    schema check said no) or error (a failure unrelated to the form)."""
+    error = stream.get("error")
+    if error:
+        return ("refused", ["the server refused the answer: structured_output_failed"]) if FORMAT_REFUSAL.search(str(error)) else ("error", [])
+    text = (stream.get("answer_text") or "").strip()
+    if not text:
+        return "no-answer", []
+    start, end = text.find("{"), text.rfind("}")
+    try:
+        value = json.loads(text[start : end + 1]) if 0 <= start < end else None
+    except ValueError:
+        value = None
+    if value is None:
+        return "not-json", ["the answer is not one JSON object"]
+    found = check_schema(value, form)
+    return ("violates", found) if found else ("fits", [])
+
+
+SCHEMA_BROKEN = ("violates", "not-json", "refused")
+
+
+def schema_summary(runs: List[Dict[str, Any]]) -> Dict[str, Any]:
+    outcomes = [r["schema"] for r in runs if isinstance(r.get("schema"), dict)]
+    first: Dict[str, int] = {}
+    for outcome in outcomes:
+        first[outcome["first_try"]] = first.get(outcome["first_try"], 0) + 1
+    judged = [o for o in outcomes if o["first_try"] not in ("error", "no-answer")]
+    return {
+        "requests": len(outcomes),
+        "first_try": first,
+        "fit_in_the_end": sum(1 for o in outcomes if o["final"] == "fits"),
+        "retries": sum(o["attempts"] - 1 for o in outcomes),
+        # None when nothing could be judged (every request failed, or thinking used the cap).
+        "held_to_form": (not any(o["first_try"] in SCHEMA_BROKEN for o in judged)) if judged else None,
+    }
+
+
+def schema_line(outcome: Dict[str, Any]) -> str:
+    first, final, attempts = outcome.get("first_try"), outcome.get("final"), outcome.get("attempts", 1)
+    if first == "fits":
+        return "fits the form"
+    if attempts > 1:
+        return "%s, then %s after %d %s" % (first, final, attempts - 1, "retry" if attempts == 2 else "retries")
+    return str(first)
 
 
 def first_run_summary(first: Dict[str, Any], summary: Dict[str, Any]) -> Dict[str, Any]:
@@ -346,6 +408,8 @@ class Bench:
             return gen_scenario()
         if sid == "sanity":
             return sanity_scenario()
+        if sid == "schema":
+            return schema_scenario()
         if sid == "control":
             return control_scenario()
         if sid == "soak":
@@ -367,9 +431,10 @@ class Bench:
     def _seed(self, *parts: object) -> int:
         return seed_from(self.seed, *(() if self.fixed_text else (self.salt,)), *parts)
 
-    def _payload(self, messages: List[Dict[str, str]], max_tokens: int) -> Dict[str, Any]:
+    def _payload(self, messages: List[Dict[str, str]], max_tokens: int, extra: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         payload: Dict[str, Any] = {"model": self.model, "messages": messages, "max_tokens": max_tokens, "temperature": 0}
         payload.update(self.extra_body)
+        payload.update(extra or {})
         return payload
 
     def _count_tokens(self, messages: List[Dict[str, str]]) -> Tuple[Optional[int], float, Optional[int]]:
@@ -514,10 +579,10 @@ class Bench:
         calibration = self.calibration.get(self.corpus.key) or {}
         return calibration.get("chars_per_token") if calibration.get("source", "default") != "default" else None
 
-    def _measure(self, messages: List[Dict[str, str]], max_tokens: int, **derive: Any) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+    def _measure(self, messages: List[Dict[str, str]], max_tokens: int, extra: Optional[Dict[str, Any]] = None, **derive: Any) -> Tuple[Dict[str, Any], Dict[str, Any]]:
         log_mark = runtimes.engine_log_mark(self.engine_log) if self.engine_log else None
         sent_at = time.monotonic() - self.clock_zero
-        stream = stream_chat(self.chat_url, self._payload(messages, max_tokens), timeout=self.timeout, api_key=self.api_key)
+        stream = stream_chat(self.chat_url, self._payload(messages, max_tokens, extra), timeout=self.timeout, api_key=self.api_key)
         if log_mark is not None and not stream.get("error"):
             usage = stream.get("usage") or {}
             timings = runtimes.engine_log_timings(self.engine_log, log_mark, usage.get("prompt_tokens"), usage.get("completion_tokens"))
@@ -603,6 +668,41 @@ class Bench:
         run.update({"nonce": nonce, "check": check, "passed": grade_sanity(stream.get("answer_text") or "", expectation) if not run.get("error") else None})
         if info:
             run["workload"] = info
+        return run
+
+    def _run_schema(self, spec: Dict[str, Any], index: int) -> Dict[str, Any]:
+        """One catalogue copied into a JSON form, asked again (as a real caller would) when the
+        answer does not fit. The timing is that of the first answer that came back."""
+        form = schema_form()
+        extra = {"response_format": {"type": "json_schema", "json_schema": {"name": "catalogue", "strict": True, "schema": form}}}
+        nonce = self._nonce(spec["id"], index)
+        messages = schema_messages(nonce, self._seed(spec["id"], index))
+        statuses: List[str] = []
+        problems: List[str] = []
+        timed: Optional[Dict[str, Any]] = None
+        last: Dict[str, Any] = {}
+        for attempt in range(SCHEMA_RETRIES + 1):
+            stream, run = self._measure(messages, spec["max_tokens"], extra=extra, expect_fresh=attempt == 0)
+            status, found = schema_outcome(stream, form)
+            statuses.append(status)
+            problems += found[:3]
+            last = run
+            if timed is None and status != "refused":
+                timed = run
+            if status in ("fits", "error"):
+                break  # done, or a failure that has nothing to do with the form
+            said = "; ".join(found[:3]) or status
+            if status != "refused" and stream.get("answer_text"):
+                messages = messages + [{"role": "assistant", "content": stream["answer_text"]}]
+            messages = messages + [{"role": "user", "content": "Your answer does not fit the form (%s). Answer again with only one JSON object that fits it." % _safe(said, 400)}]
+        run = timed if timed is not None else last
+        if timed is None and statuses[-1] == "refused":
+            # Every answer came back and every one was refused by the server's own schema
+            # check: that is this scenario's finding, not a failed request. No timing exists.
+            run["error"] = None
+            run["flags"] = [flag for flag in run["flags"] if flag != "error"]
+        run["flags"] = [flag for flag in run["flags"] if flag not in ("short-output", "single-burst", "buffered-stream")]
+        run.update({"nonce": nonce, "schema": {"first_try": statuses[0], "final": statuses[-1], "attempts": len(statuses), "problems": [_safe(p, 200) for p in problems[:5]]}})
         return run
 
     def _run_parallel(self, spec: Dict[str, Any], index: int) -> Dict[str, Any]:
@@ -776,6 +876,7 @@ class Bench:
                 runner = {
                     "chat": self._run_chat, "context": self._run_context, "followup": self._run_followup,
                     "parallel": self._run_parallel, "soak": self._run_context, "sanity": self._run_sanity,
+                    "schema": self._run_schema,
                 }[spec["kind"]]
                 sampler.start()
                 try:
@@ -846,6 +947,8 @@ class Bench:
             record["summary"]["stability"] = soak_stability(record["runs"])
         if record["kind"] == "sanity":
             record["summary"].update(sanity_summary(record["runs"]))
+        if record["kind"] == "schema":
+            record["summary"]["schema"] = schema_summary(record["runs"])
         if record["kind"] == "parallel":
             worst = [r["ttft_worst_s"] for r in record["runs"] if run_is_valid(r) and r.get("ttft_worst_s") is not None]
             if worst:
@@ -914,6 +1017,8 @@ class Bench:
             prefix = "%-14s loop %d" % (spec["id"], index + 1)
         elif spec["kind"] == "sanity":
             prefix = "%-14s %-10s" % (spec["id"], run.get("check"))
+        elif spec["kind"] == "schema":
+            prefix = "%-14s run %d/%d  %s" % (spec["id"], index + 1, spec["runs"], schema_line(run.get("schema") or {}))
         else:
             prefix = "%-14s run %d/%d" % (spec["id"], index + 1, spec["runs"])
         if run.get("error"):
@@ -1115,6 +1220,16 @@ def verdict(result: Dict[str, Any]) -> Dict[str, Any]:
             cautions.append("%s: no answer text for %s within the output cap (thinking used it up)" % (sid, ", ".join(str(c) for c in summary["checks_inconclusive"])))
         if summary.get("checks_errored"):
             cautions.append("%s: the request for %s failed, so that check says nothing" % (sid, ", ".join(str(c) for c in summary["checks_errored"])))
+        shape = summary.get("schema") or {}
+        if shape.get("held_to_form") is False:
+            broken = sum(count for status, count in (shape.get("first_try") or {}).items() if status in SCHEMA_BROKEN)
+            cautions.append(
+                "%s: %d of %d first answers did not fit the JSON schema (%s); this server does not hold the model to the schema, "
+                "so callers must validate and ask again (%d of %d fit after up to %d retries)" % (
+                    sid, broken, shape.get("requests", 0), ", ".join("%s %d" % item for item in sorted((shape.get("first_try") or {}).items())),
+                    shape.get("fit_in_the_end", 0), shape.get("requests", 0), SCHEMA_RETRIES))
+        elif shape.get("requests") and shape.get("held_to_form") is None:
+            cautions.append("%s: no answer could be judged against the schema (failed requests, or thinking used the output cap)" % sid)
         if any((run.get("workload") or {}).get("wrapped") for run in record.get("runs") or []):
             cautions.append("%s: the corpus is smaller than the prompt, so its text repeats inside it (this flatters engines that speed up on repeated text)" % sid)
     if blocked:

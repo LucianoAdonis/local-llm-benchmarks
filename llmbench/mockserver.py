@@ -40,7 +40,25 @@ DEFAULTS: Dict[str, Any] = {
     "n_ctx": 0,                  # >0: context window in tokens
     "context_error": False,      # with n_ctx: reject oversized prompts instead of truncating
     "stop_after_tokens": 0,      # >0: end early with finish_reason "stop"
+    # How a request with a JSON schema in response_format is answered: "enforce" holds the
+    # answer to the schema (a grammar, as llama.cpp and LM Studio do); "ignore" copies the
+    # catalogue's long descriptions and so breaks maxLength; "refuse" answers HTTP 502
+    # structured_output_failed, as Strata does. The last two fit once they are told what was
+    # wrong, so a caller's retry is exercised too. "" leaves response_format unread.
+    "schema": "enforce",
 }
+
+_CATALOGUE_LINE = re.compile(r"^\d+\. (.+?) \| (\d+) \| (.+)$", re.M)
+SCHEMA_REFUSAL = {"error": {"code": "structured_output_failed", "message": "the model's answer does not match the requested schema", "type": "server_error"}}
+
+
+def schema_answer(messages: List[Dict[str, Any]], fit: bool) -> str:
+    """The catalogue in the probe's JSON form, its descriptions cut to fit or left whole."""
+    text = "\n".join(str(m.get("content") or "") for m in messages if m.get("role") == "user")
+    items = []
+    for name, price, description in _CATALOGUE_LINE.findall(text):
+        items.append({"name": name[:60], "price": int(price), "description": description[:80] if fit else description})
+    return json.dumps({"items": items})
 
 # time.sleep() is not precise enough to pace tokens: measured overshoot is 4 to 15 ms on
 # macOS (timer coalescing) and up to a 15.6 ms tick on older Windows Pythons. So sleep only
@@ -222,6 +240,13 @@ class MockHandler(BaseHTTPRequestHandler):
         reasoning_tokens = min(int(config["reasoning_tokens"]), completion_tokens)
         inline = config["reasoning_field"] == "inline"
         scripted = scripted_answer(messages, visible_text)
+        response_format = request.get("response_format")
+        if isinstance(response_format, dict) and response_format.get("type") == "json_schema" and config["schema"]:
+            told = "does not fit the form" in str((messages[-1] if messages else {}).get("content") or "")
+            if (config["schema"] == "refuse" and not told) or config["schema"] == "refuse-always":
+                self._json(502, SCHEMA_REFUSAL)
+                return
+            scripted = schema_answer(messages, fit=config["schema"] == "enforce" or told)
         scripted_words: List[str] = []
         if scripted is not None:  # a question with a known right answer: think, answer, stop
             scripted_words = scripted.split(" ")

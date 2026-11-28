@@ -108,3 +108,27 @@ class PromptTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class SchemaFormTest(unittest.TestCase):
+    def test_catalogue_descriptions_are_longer_than_the_form_allows(self):
+        from llmbench.workload import SCHEMA_DESCRIPTION_MAX, SCHEMA_ITEMS, schema_messages
+
+        text = schema_messages("n", 7)[1]["content"]
+        lines = [line for line in text.splitlines() if " | " in line and line[0].isdigit()]
+        self.assertEqual(len(lines), SCHEMA_ITEMS)
+        self.assertTrue(all(len(line.split(" | ")[2]) > SCHEMA_DESCRIPTION_MAX for line in lines))
+        self.assertEqual(text, schema_messages("n", 7)[1]["content"])
+
+    def test_check_schema(self):
+        from llmbench.workload import check_schema, schema_form
+
+        form = schema_form()
+        good = {"items": [{"name": "A", "price": 10, "description": "short"}]}
+        self.assertEqual(check_schema(good, form), [])
+        bad = {"items": [{"name": "A", "price": "10", "description": "x" * 81, "extra": 1}], "more": True}
+        problems = check_schema(bad, form)
+        self.assertEqual(len(problems), 4, problems)
+        self.assertTrue(any("81 characters" in p for p in problems))
+        self.assertEqual(check_schema({"items": [{"name": "A", "price": True, "description": ""}]}, form), ["$.items[0].price is not a whole number"])
+        self.assertEqual(check_schema([], form), ["$ is not an object"])

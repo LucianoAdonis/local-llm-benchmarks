@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import csv as csv_module
 import io
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from . import PROTOCOL_VERSION
 from .metrics import compare_stats, meaningful_spread, stability
@@ -81,6 +81,10 @@ def _notes(record: Dict[str, Any]) -> str:
         speedups = sorted(r["cache_speedup"] for r in record.get("runs") or [] if r.get("cache_speedup"))
         if speedups:
             notes.insert(0, "first token x%.0f sooner" % speedups[len(speedups) // 2])
+    shape = summary.get("schema") or {}
+    if shape.get("requests"):
+        fits = (shape.get("first_try") or {}).get("fits", 0)
+        notes.insert(0, "%d of %d fit the schema first time, %d after retries" % (fits, shape["requests"], shape.get("fit_in_the_end", 0)))
     if record.get("kind") == "parallel":
         notes.insert(0, "total across %d requests" % record.get("parallel", 0))
         if isinstance(summary.get("ttft_worst_s"), (int, float)):
@@ -241,6 +245,17 @@ def csv(result: Dict[str, Any]) -> str:
     return buffer.getvalue()
 
 
+def thinking_share(result: Dict[str, Any]) -> Optional[Tuple[int, int]]:
+    """(runs in which the model thought, runs that could tell), or None when none could."""
+    runs = [
+        run for record in result.get("scenarios") or [] for run in record.get("runs") or []
+        if isinstance(run, dict) and not run.get("error") and ("reasoning_seen" in run or "hidden_tokens" in run)
+    ]
+    if not runs:
+        return None
+    return sum(1 for run in runs if run.get("reasoning_seen") or run.get("hidden_tokens")), len(runs)
+
+
 def compare(base: Dict[str, Any], new: Dict[str, Any]) -> str:
     """A/B two result files. Differences smaller than the run-to-run spread are noise."""
     out: List[str] = []
@@ -256,7 +271,15 @@ def compare(base: Dict[str, Any], new: Dict[str, Any]) -> str:
     if tool_a.get("protocol") != PROTOCOL_VERSION:
         out.append("note: these files use protocol %s; this tool is %s." % (tool_a.get("protocol"), PROTOCOL_VERSION))
     differences = []
-    for key, label in (("corpus", "corpus"), ("context_tokens", "context window"), ("extra_body", "request options")):
+    thought_a, thought_b = thinking_share(base), thinking_share(new)
+    if thought_a and thought_b and (thought_a[0] > 0) != (thought_b[0] > 0):
+        # The mistake this guards against was made on the reference PC: Strata looked about
+        # twice as fast as LM Studio until both were run with thinking off.
+        out.append(
+            "THINKING DIFFERS: the model thought in %d of %d runs in A and %d of %d in B. Writing speed counts thinking tokens, "
+            "but how long a task takes depends mostly on how much the model thinks (switching it off made one real job 4.2 times "
+            "faster on the same engine). Rerun both with the same --thinking setting before reading the table as an engine comparison." % (thought_a + thought_b))
+    for key, label in (("corpus", "corpus"), ("context_tokens", "context window"), ("extra_body", "request options"), ("thinking", "--thinking")):
         a, b = (base.get("settings") or {}).get(key), (new.get("settings") or {}).get(key)
         if a != b:
             differences.append("%s: %s vs %s" % (label, a, b))

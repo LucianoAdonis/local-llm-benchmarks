@@ -421,7 +421,7 @@ def cmd_mock(args: argparse.Namespace) -> int:
     server = MockServer(
         port=args.port, prefill_tok_s=args.prefill, decode_tok_s=args.decode, overhead_ms=args.overhead_ms, chunk_tokens=args.chunk_tokens,
         reasoning_tokens=args.reasoning_tokens, reasoning_field=args.reasoning_field, reasoning_details=args.reasoning_details, cache=args.cache, cache_slots=args.cache_slots, n_ctx=args.n_ctx,
-        include_timings=args.timings, include_usage=not args.no_usage,
+        include_timings=args.timings, include_usage=not args.no_usage, schema=args.schema,
     ).start()
     if args.announce:
         print("PORT %d" % server.port, flush=True)
@@ -604,6 +604,7 @@ def build_parser() -> argparse.ArgumentParser:
     mock.add_argument("--n-ctx", type=int, default=0, help="imitate a context window that silently truncates")
     mock.add_argument("--timings", action="store_true", help="attach llama.cpp-style engine timings")
     mock.add_argument("--no-usage", action="store_true")
+    mock.add_argument("--schema", default="enforce", choices=("enforce", "ignore", "refuse"), help="how a JSON-schema request is answered: held to the schema, broken, or refused with HTTP 502 as Strata does")
     mock.add_argument("--announce", action="store_true", help=argparse.SUPPRESS)
     mock.set_defaults(func=cmd_mock)
 
