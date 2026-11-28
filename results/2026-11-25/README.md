@@ -1,5 +1,7 @@
 # Runtime iteration — 2026-11-25
 
+> **Correction, 2026-11-28.** Every `llmbench` run below had model thinking on, and within each output cap the models wrote only thinking. The rates are valid as generated tokens but are not the speed at which answers appear. The Strata and Bionic tables also use different model files and timing sources, so together they suggested that Strata was about twice as fast as LM Studio. On one file with thinking off the two are close, and LM Studio is faster with parallel requests. See [2026-11-28](../2026-11-28/README.md).
+
 This iteration exercises LLMBench on the same PC used for the November 23 baseline. It updates Strata's inference components, benchmarks two Strata models with the native suite, and benchmarks the same model family through Bionic's native API. Raw Strata reports remain local because they include machine paths and generated output; the sanitized summary JSON files here contain the metrics needed for comparison.
 
 ## Machine and software

@@ -57,6 +57,10 @@ Three cautions from the later review ([benchmark-design.md](benchmark-design.md)
 
 On the same PC, Strata 0.2.21.1 / engine 0.1.67's native suite measured Inkling SQ-10 at 168.8 tok/s around a 3.4K prompt (report marked nonconforming) and Qwen3.6 UD-Q4_K_XL at 186.1 tok/s around a 4.1K prompt (complete report). The diverse-corpus `llmbench` quick suite measured Inkling SQ-10 at **195 tok/s** around 3.5K and **168 tok/s** around 14.5K, with **7,121 tok/s** read speed at the larger depth. Qwen3.6 UD-Q4_K_XL measured **284 tok/s** around 3.4K and **215 tok/s** around 14.6K, reading at **9,626 tok/s** at the larger depth. Both reports say Strata emitted hidden thinking tokens; the Qwen run also reached 97% VRAM use. Treat its rate as generated tokens, not visible answer text, and use a lower-context follow-up to check memory pressure. See the [iteration record](../results/2026-11-25/README.md); the three methods and workloads should not be treated as one direct ranking.
 
+## 2026-11-28 correction
+
+Those Qwen and Inkling rates were measured with thinking on. Within each output cap the models wrote only thinking, so the numbers say how fast tokens are generated, not how soon an answer appears. On one Qwen3.6 UD-Q4_K_XL file with thinking off, Strata wrote 305 tok/s on a short chat and 194 at a 16K prompt; LM Studio wrote 226 and 197. Four requests at once gave LM Studio 383 tok/s in total and Strata 286. On a real JSON job, thinking off was 4.2 times faster and Strata was 15% slower than LM Studio. Earlier comparisons that put Strata at about twice LM Studio's speed mixed model files, timing sources and thinking states; see [results/2026-11-28](../results/2026-11-28/README.md).
+
 ## What counts as a meaningful change
 
 - Compare medians from repeated runs and keep the range. A one-off long-context result is a data point, not a stable average.

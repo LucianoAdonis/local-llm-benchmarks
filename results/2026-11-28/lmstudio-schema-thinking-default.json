@@ -1,0 +1,463 @@
+{
+  "schema": "llmbench-result/2",
+  "tool": {
+    "name": "llmbench",
+    "version": "0.2.0",
+    "protocol": "2.0",
+    "workload": "2.0"
+  },
+  "created_utc": "2026-11-28T15:30:55+00:00",
+  "duration_s": 66.1,
+  "label": "lmstudio-schema-thinking-default",
+  "suite": "quick",
+  "aborted": false,
+  "system": {
+    "platform": "Windows",
+    "arch": "AMD64",
+    "python": "3.14.7",
+    "cpu": "AMD Ryzen 9 9950X3D 16-Core Processor",
+    "cpu_cores": 16,
+    "cpu_threads": 32,
+    "os": "Microsoft Windows 11 Pro (build 26300)",
+    "ram_gb": 127.6,
+    "ram_modules": 4,
+    "ram_speed_mhz": 5200,
+    "gpus": [
+      {
+        "name": "NVIDIA GeForce RTX 5090",
+        "driver": "621.01",
+        "vram_gb": 31.8
+      }
+    ],
+    "disks": [
+      {
+        "name": "CT4000T500SSD3",
+        "media": "SSD",
+        "bus": "NVMe",
+        "size_gb": 4001
+      },
+      {
+        "name": "KINGSTON SFYR2S2T0",
+        "media": "SSD",
+        "bus": "NVMe",
+        "size_gb": 2048
+      },
+      {
+        "name": "ST8000DM004-2U9188",
+        "media": "HDD",
+        "bus": "SATA",
+        "size_gb": 8002
+      }
+    ]
+  },
+  "state_before": {
+    "power_plan": "Balanced",
+    "gpu_shared_memory_mb": 302,
+    "gpu": {
+      "vram_used_mb": 25133.0,
+      "vram_total_mb": 32607.0,
+      "temperature_c": 45.09,
+      "power_w": 51.42,
+      "power_limit_w": 575.0,
+      "utilization_pct": 5.0
+    },
+    "gpu_compute_processes": 35
+  },
+  "state_after": {
+    "power_plan": "Balanced",
+    "gpu_shared_memory_mb": 303,
+    "gpu": {
+      "vram_used_mb": 25139.0,
+      "vram_total_mb": 32607.0,
+      "temperature_c": 55.97,
+      "power_w": 222.71,
+      "power_limit_w": 575.0,
+      "utilization_pct": 2.0
+    },
+    "gpu_compute_processes": 35
+  },
+  "preflight_warnings": [],
+  "runtime": {
+    "name": "lmstudio",
+    "version": null,
+    "context_tokens": 32768,
+    "engine": "llama.cpp-win-x86_64-nvidia-cuda-avx2",
+    "engine_version": "2.83.0",
+    "model_details": {
+      "arch": "qwen35moe",
+      "quantization": "Q4_K_XL",
+      "compatibility_type": "gguf",
+      "publisher": "llmbench-test",
+      "state": "loaded",
+      "max_context_length": 262144,
+      "loaded_context_length": 32768,
+      "type": "llm",
+      "bits_per_weight": 4,
+      "params_string": "35B-A3B",
+      "format": "gguf",
+      "architecture": "qwen35moe",
+      "size_bytes": 22853663008,
+      "loaded_parallel": 4,
+      "loaded_flash_attention": true,
+      "loaded_eval_batch_size": 2048,
+      "loaded_offload_kv_cache_to_gpu": true,
+      "quant": "Q4_K_XL",
+      "context_length": 32768
+    },
+    "loaded_models": [
+      "qwen3.6-35b-a3b-ud"
+    ]
+  },
+  "model": {
+    "id": "qwen3.6-35b-a3b-ud",
+    "details": {
+      "arch": "qwen35moe",
+      "quantization": "Q4_K_XL",
+      "compatibility_type": "gguf",
+      "publisher": "llmbench-test",
+      "state": "loaded",
+      "max_context_length": 262144,
+      "loaded_context_length": 32768,
+      "type": "llm",
+      "bits_per_weight": 4,
+      "params_string": "35B-A3B",
+      "format": "gguf",
+      "architecture": "qwen35moe",
+      "size_bytes": 22853663008,
+      "loaded_parallel": 4,
+      "loaded_flash_attention": true,
+      "loaded_eval_batch_size": 2048,
+      "loaded_offload_kv_cache_to_gpu": true,
+      "quant": "Q4_K_XL",
+      "context_length": 32768
+    }
+  },
+  "settings": {
+    "temperature": 0,
+    "context_tokens": 32768,
+    "context_source": "argument",
+    "corpus": "diverse",
+    "seed": "llmbench",
+    "text_salt": "1bcc74ef",
+    "scenario_ids": [
+      "schema"
+    ],
+    "custom_selection": true,
+    "extra_body": null,
+    "endpoint": "loopback:1235",
+    "declared_cold_start": false,
+    "thinking": "default",
+    "size_warmup": true,
+    "engine_log_used": false
+  },
+  "warmup": {
+    "ttft_s": 0.310391,
+    "wall_s": 0.420369,
+    "prompt_tokens": 114,
+    "completion_tokens": 32,
+    "flags": [
+      "reasoning-only",
+      "buffered-stream"
+    ]
+  },
+  "calibration": {
+    "diverse": {
+      "corpus": "diverse",
+      "source": "probe",
+      "chars_per_token": 3.69935,
+      "overhead_tokens": 0.406602,
+      "probe_tokens": 3391,
+      "rough_prefill_tok_s": 9266.24
+    }
+  },
+  "scenarios": [
+    {
+      "id": "schema",
+      "kind": "schema",
+      "max_tokens": 2048,
+      "runs": [
+        {
+          "error": null,
+          "flags": [
+            "reasoning-only",
+            "hidden-tokens"
+          ],
+          "prompt_tokens": 504,
+          "prompt_tokens_source": "usage",
+          "completion_tokens": 2048,
+          "completion_tokens_source": "usage",
+          "cached_tokens": null,
+          "cached_tokens_source": null,
+          "fresh_prompt_tokens": 504,
+          "finish_reason": "length",
+          "ttft_s": 0.159232,
+          "ttfa_s": null,
+          "decode_window_s": 6.59222,
+          "wall_s": 6.75149,
+          "connect_s": 0.0003684,
+          "reasoning_seen": true,
+          "answer_seen": false,
+          "inline_think": false,
+          "text_events": 1966,
+          "bursts": 1007,
+          "stream_granularity": 0.492,
+          "stream_reading": "hidden",
+          "hidden_tokens": 82,
+          "hidden_tokens_source": "stream",
+          "output_chars": 8557,
+          "gap_median_ms": 0.124,
+          "gap_p95_ms": 12.13,
+          "gap_max_ms": 27.164,
+          "client_decode_tok_s": 298.079,
+          "client_prefill_tok_s": null,
+          "engine_decode_tok_s": null,
+          "engine_prefill_tok_s": null,
+          "engine": null,
+          "decode_tok_s": 298.079,
+          "decode_source": "client",
+          "prefill_tok_s": null,
+          "prefill_source": null,
+          "at_s": 3.576,
+          "nonce": "fed96f7e-1bcc74ef-schema-0",
+          "schema": {
+            "first_try": "no-answer",
+            "final": "no-answer",
+            "attempts": 3,
+            "problems": []
+          }
+        },
+        {
+          "error": null,
+          "flags": [
+            "reasoning-only",
+            "hidden-tokens"
+          ],
+          "prompt_tokens": 474,
+          "prompt_tokens_source": "usage",
+          "completion_tokens": 2048,
+          "completion_tokens_source": "usage",
+          "cached_tokens": null,
+          "cached_tokens_source": null,
+          "fresh_prompt_tokens": 474,
+          "finish_reason": "length",
+          "ttft_s": 0.16516,
+          "ttfa_s": null,
+          "decode_window_s": 6.59478,
+          "wall_s": 6.766,
+          "connect_s": 0.0138022,
+          "reasoning_seen": true,
+          "answer_seen": false,
+          "inline_think": false,
+          "text_events": 1955,
+          "bursts": 1054,
+          "stream_granularity": 0.515,
+          "stream_reading": "hidden",
+          "hidden_tokens": 93,
+          "hidden_tokens_source": "stream",
+          "output_chars": 8551,
+          "gap_median_ms": 0.132,
+          "gap_p95_ms": 12.097,
+          "gap_max_ms": 25.113,
+          "client_decode_tok_s": 296.295,
+          "client_prefill_tok_s": null,
+          "engine_decode_tok_s": null,
+          "engine_prefill_tok_s": null,
+          "engine": null,
+          "decode_tok_s": 296.295,
+          "decode_source": "client",
+          "prefill_tok_s": null,
+          "prefill_source": null,
+          "at_s": 24.124,
+          "nonce": "b7c28bdf-1bcc74ef-schema-1",
+          "schema": {
+            "first_try": "no-answer",
+            "final": "no-answer",
+            "attempts": 3,
+            "problems": []
+          }
+        },
+        {
+          "error": null,
+          "flags": [
+            "reasoning-only",
+            "hidden-tokens"
+          ],
+          "prompt_tokens": 538,
+          "prompt_tokens_source": "usage",
+          "completion_tokens": 2048,
+          "completion_tokens_source": "usage",
+          "cached_tokens": null,
+          "cached_tokens_source": null,
+          "fresh_prompt_tokens": 538,
+          "finish_reason": "length",
+          "ttft_s": 0.195975,
+          "ttfa_s": null,
+          "decode_window_s": 6.53636,
+          "wall_s": 6.7324,
+          "connect_s": 0.0144674,
+          "reasoning_seen": true,
+          "answer_seen": false,
+          "inline_think": false,
+          "text_events": 1965,
+          "bursts": 875,
+          "stream_granularity": 0.427,
+          "stream_reading": "hidden",
+          "hidden_tokens": 83,
+          "hidden_tokens_source": "stream",
+          "output_chars": 8927,
+          "gap_median_ms": 0.101,
+          "gap_p95_ms": 12.165,
+          "gap_max_ms": 26.403,
+          "client_decode_tok_s": 300.473,
+          "client_prefill_tok_s": null,
+          "engine_decode_tok_s": null,
+          "engine_prefill_tok_s": null,
+          "engine": null,
+          "decode_tok_s": 300.473,
+          "decode_source": "client",
+          "prefill_tok_s": null,
+          "prefill_source": null,
+          "at_s": 44.736,
+          "nonce": "a9d7daed-1bcc74ef-schema-2",
+          "schema": {
+            "first_try": "no-answer",
+            "final": "no-answer",
+            "attempts": 3,
+            "problems": []
+          }
+        }
+      ],
+      "title": "Copy a catalogue into a fixed JSON form: does the server hold the model to the schema?",
+      "planned_runs": 3,
+      "gpu": {
+        "samples": 62,
+        "temperature_c": {
+          "min": 52.5,
+          "mean": 57.0,
+          "max": 60.29
+        },
+        "power_w": {
+          "min": 233.34,
+          "mean": 286.4,
+          "max": 305.18
+        },
+        "utilization_pct": {
+          "min": 20.0,
+          "mean": 69.8,
+          "max": 87.0
+        },
+        "vram_used_mb": {
+          "min": 25131.0,
+          "mean": 25134.8,
+          "max": 25142.0
+        }
+      },
+      "summary": {
+        "runs_total": 3,
+        "runs_valid": 3,
+        "prompt_tokens": {
+          "n": 3,
+          "median": 504.0,
+          "min": 474.0,
+          "max": 538.0,
+          "mean": 505.333,
+          "stdev": 32.0208,
+          "cv_pct": 6.33658,
+          "spread_pct": 6.34921
+        },
+        "fresh_prompt_tokens": {
+          "n": 3,
+          "median": 504.0,
+          "min": 474.0,
+          "max": 538.0,
+          "mean": 505.333,
+          "stdev": 32.0208,
+          "cv_pct": 6.33658,
+          "spread_pct": 6.34921
+        },
+        "completion_tokens": {
+          "n": 3,
+          "median": 2048.0,
+          "min": 2048.0,
+          "max": 2048.0,
+          "mean": 2048.0,
+          "stdev": 0.0,
+          "cv_pct": 0.0,
+          "spread_pct": 0.0
+        },
+        "ttft_s": {
+          "n": 3,
+          "median": 0.16516,
+          "min": 0.159232,
+          "max": 0.195975,
+          "mean": 0.173456,
+          "stdev": 0.0197263,
+          "cv_pct": 11.3725,
+          "spread_pct": 11.1235
+        },
+        "wall_s": {
+          "n": 3,
+          "median": 6.75149,
+          "min": 6.7324,
+          "max": 6.766,
+          "mean": 6.74996,
+          "stdev": 0.0168524,
+          "cv_pct": 0.249666,
+          "spread_pct": 0.248838
+        },
+        "decode_tok_s": {
+          "n": 3,
+          "median": 298.079,
+          "min": 296.295,
+          "max": 300.473,
+          "mean": 298.282,
+          "stdev": 2.09632,
+          "cv_pct": 0.702799,
+          "spread_pct": 0.700786
+        },
+        "client_decode_tok_s": {
+          "n": 3,
+          "median": 298.079,
+          "min": 296.295,
+          "max": 300.473,
+          "mean": 298.282,
+          "stdev": 2.09632,
+          "cv_pct": 0.702799,
+          "spread_pct": 0.700786
+        },
+        "flags": {
+          "reasoning-only": 3,
+          "hidden-tokens": 3
+        },
+        "decode_source": "client",
+        "prefill_source": null,
+        "schema": {
+          "requests": 3,
+          "first_try": {
+            "no-answer": 3
+          },
+          "fit_in_the_end": 0,
+          "retries": 6,
+          "held_to_form": null
+        }
+      }
+    }
+  ],
+  "notes": [],
+  "headline": {
+    "chat_first_token_s": null,
+    "writing_tok_s": null,
+    "writing_source": null,
+    "reading_tok_s": {},
+    "request_seconds": {}
+  },
+  "verdict": {
+    "status": "usable with cautions",
+    "problems": [],
+    "cautions": [
+      "schema: the model only produced thinking within the output cap (speeds are still valid)",
+      "schema: the server counted tokens that never appeared in the stream (often suppressed thinking); the wait for the first token includes writing them",
+      "schema: no answer could be judged against the schema (failed requests, or thinking used the output cap)"
+    ]
+  }
+}
